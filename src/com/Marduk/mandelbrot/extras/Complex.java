@@ -1,4 +1,4 @@
-package com.Samsara.mandelbrot;
+package com.Marduk.mandelbrot.extras;
 
 // Complex.java
 
@@ -48,7 +48,7 @@ package com.Samsara.mandelbrot;
 import net.jafama.*;
 
 public strictfp class Complex extends Object {
-	double x, y; // Cartesian representation of complex
+	public double x, y; // Cartesian representation of complex
 
 	/** cartesian coordinates real and imaginary are NaN */
 	public Complex() {

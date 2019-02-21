@@ -1,4 +1,4 @@
-package com.Samsara.mandelbrot;
+package com.Marduk.mandelbrot;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -9,7 +9,9 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-public class Game extends Canvas implements Runnable {
+import com.Marduk.mandelbrot.extras.Gif;
+
+public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 	public static final String TITLE = "Fractal Dive";
 
@@ -17,17 +19,14 @@ public class Game extends Canvas implements Runnable {
 	private Thread thread;
 	private BufferedImage img;
 	private int[] pixels;
-	InputHandler input = new InputHandler();
 	static JFrame frame = new JFrame();
 
-	public Game() {
-		Dimension size = new Dimension(Gen.width, Gen.height);
+	public Main() {
+		Dimension size = new Dimension(Generator.width, Generator.height);
 		setPreferredSize(size);
 		setMaximumSize(size);
 		setMinimumSize(size);
-		addMouseWheelListener(input);
-		addKeyListener(input);
-		img = new BufferedImage(Gen.width, Gen.height, BufferedImage.TYPE_INT_RGB);
+		img = new BufferedImage(Generator.width, Generator.height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	}
 
@@ -61,11 +60,10 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	private void tick() {
-		InputHandler.update();
-		if (Gen.record && Gen.time-1 == Gen.frames) {
+		if (Generator.record && Generator.time-1 == Generator.frames) {
 			Gif.run();
 			running = false;
-			System.out.println("Final x: "+Gen.ox+" Final y: "+Gen.oy);
+			System.out.println("Final x: "+Generator.c.x+" Final y: "+Generator.c.y);
 		}
 	}
 
@@ -75,19 +73,19 @@ public class Game extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
-		int[] pix = Gen.generate();
-		for (int i = 0; i < Gen.width * Gen.height; i++)
+		int[] pix = Generator.generate();
+		for (int i = 0; i < Generator.width * Generator.height; i++)
 			pixels[i] = pix[i];
-		if (Gen.record && Gen.time > 1)
-			Gen.savePic(pix, "giffer/img" + (Gen.time - 2) + ".png");
+		if (Generator.record && Generator.time > 1)
+			Generator.savePic(pix, "giffer/img" + (Generator.time - 2) + ".png");
 		Graphics g = bs.getDrawGraphics();
-		g.drawImage(img, 0, 0, Gen.width + 10, Gen.height + 10, null);
+		g.drawImage(img, 0, 0, Generator.width + 10, Generator.height + 10, null);
 		g.dispose();
 		bs.show();
 	}
 
 	public static void main(String[] args) {
-		Game game = new Game();
+		Main game = new Main();
 		frame.add(game);
 		frame.pack();
 		frame.setTitle(TITLE);

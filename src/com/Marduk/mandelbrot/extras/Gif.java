@@ -1,4 +1,4 @@
-package com.Samsara.mandelbrot;
+package com.Marduk.mandelbrot.extras;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,6 +15,8 @@ import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
+
+import com.Marduk.mandelbrot.Generator;
 
 public abstract class Gif {
 	
@@ -39,7 +41,7 @@ public abstract class Gif {
 		gifWriter.prepareWriteSequence(null);
 		for (int i = 0; i < images.length; i++) {
 			BufferedImage img = images[i];
-			if(i%10==0)System.out.println("Saving gif: " + i / (double) Gen.frames * 100 + "%");
+			if(i%10==0)System.out.println("Saving gif: " + i / (double) Generator.frames * 100 + "%");
 			IIOImage temp = new IIOImage(img, null, metadata);
 			gifWriter.writeToSequence(temp, null);
 		}
@@ -107,8 +109,8 @@ public abstract class Gif {
 	}
 
 	public static void run() {
-		String[] imgs = new String[Gen.frames];
-		for (int i = 0; i < Gen.frames; i++)
+		String[] imgs = new String[Generator.frames];
+		for (int i = 0; i < Generator.frames; i++)
 			imgs[i] = "giffer/img" + i + ".png";
 		try {
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
