@@ -30,6 +30,7 @@ public class Styler {
 		inventCycle();
 	}
 	
+	//initialize with a magic palette image
 	public Styler(File f) {
 		type = "magicpalette";
 		BufferedImage img = null;
@@ -46,6 +47,7 @@ public class Styler {
 				cycler[x][y] = img.getRGB(x, y);
 	}
 	
+	//get a color from a depth and time, depending on style
 	public int getColor(int depth, int time, int lastMinDepth, int lastMaxDepth) {
 		int r = 0, g = 0, b = 0;
 		boolean background = false;
@@ -103,6 +105,7 @@ public class Styler {
 		return r*0x10000+g*0x100+b;
 	}
 	
+	//generate a random color cycle to be looped through
 	public void inventCycle() {
 		cycleHeight = 1;
 		cycleWidth = (int) (Math.random()*3+3);
@@ -114,6 +117,7 @@ public class Styler {
 		return x*x;
 	}
 	
+	//linear interpolate between two colors
 	public static int colorLerp(int a, int b, double w) {
 		int r1 = (a&0xff0000)>>16;
 		int g1 = (a&0xff00)>>8;

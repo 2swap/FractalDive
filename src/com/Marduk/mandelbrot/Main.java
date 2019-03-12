@@ -85,14 +85,14 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Main game = new Main();
-		frame.add(game);
+		Main main = new Main();
+		frame.add(main);
 		frame.pack();
 		frame.setTitle(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		game.start();
+		main.start();
 	}
 }
