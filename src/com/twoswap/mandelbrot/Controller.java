@@ -41,7 +41,7 @@ public class Controller {
 	
 	//called after every tick
 	public void zoom(int[] last, int w, int h, int t) {
-		double q = t;
+		double q = 4*(t/200.-.5);
 		//r0 = .25 * Math.cos(q) - 1;
 		//i0 = .25 * Math.sin(q); // left cir
         //double tx = .25 * Math.cos(runs / 512.0) - 1, ty = .25 * Math.sin(runs / 512.0); // left cir
@@ -51,7 +51,7 @@ public class Controller {
 		//i0 = q*Math.sin(q);//spiral
 		//r0 = Math.cos(q);
 		//i0 = Math.sin(q);//circle
-		r0 = 1+Math.exp(-q);
+		r0 = q;
 		i0 = 0;
 		//angle += va;//rotate appropriately
 		zoom *= zoomSpeed;//zoom in

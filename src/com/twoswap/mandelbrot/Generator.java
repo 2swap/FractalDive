@@ -14,12 +14,12 @@ public class Generator {
 	//dont touch stuff in this block
 	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0;//some stuff the program keeps track of
 	public static Styler s = new Styler("rainbow",.2); //The look of the palette and such
-	public static Controller c = new Controller(0,0,1,5); //The thing that controls the motion of the zoom
+	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
 	public static int width = 256, height = 256; //screen size
 	public static boolean renderCPoint = false;
-	public static int frames = 100;//how long the gif should be
+	public static int frames = 200;//how long the gif should be
 	public static boolean record = true; //Whether or not to save it as gif
 	
 	//generates one frame.
@@ -158,7 +158,14 @@ public class Generator {
 		double rotY = (x - width / 2) * Math.sin(c.angle) + (y - height / 2) * Math.cos(c.angle);
 		double rPart = rotX / (c.zoom) + c.x;
 		double iPart = rotY / (c.zoom) + c.y;// width, zoom is in terms of width. Stretched otherwise.
-		int depth = computeDepth(c.r0, c.i0, 0, 0, rPart, iPart);
+		
+		//this is for last minute changes to pixel coords.
+		double pointAng = Math.atan2(rPart, iPart);
+		double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
+		rPart = pointDist * Math.sin(pointAng);
+		iPart = pointDist * Math.cos(pointAng);
+		
+		int depth = computeDepth(0, 0, rPart, iPart, 2, 0);
 		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth);
 		return depth == -1;
 	}
