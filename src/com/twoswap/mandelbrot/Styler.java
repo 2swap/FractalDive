@@ -1,4 +1,4 @@
-package com.Marduk.mandelbrot;
+package com.twoswap.mandelbrot;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

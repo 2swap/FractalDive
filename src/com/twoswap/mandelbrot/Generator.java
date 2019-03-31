@@ -1,4 +1,4 @@
-package com.Marduk.mandelbrot;
+package com.twoswap.mandelbrot;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,21 +7,19 @@ import java.sql.Timestamp;
 
 import javax.imageio.ImageIO;
 
-import com.Marduk.mandelbrot.extras.Complex;
+import com.twoswap.mandelbrot.extras.Complex;
 
 public class Generator {
 
 	//dont touch stuff in this block
 	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0;//some stuff the program keeps track of
 	public static Styler s = new Styler("rainbow",.2); //The look of the palette and such
-	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
+	public static Controller c = new Controller(0,0,1,5); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
 	public static int width = 256, height = 256; //screen size
-	public static double pow = 2;//exponent of the iterated function
-	public static Complex cpow = new Complex(10,0);
-	public static boolean usingComplexPower = true, renderCPoint = false;
-	public static int frames = 200;//how long the gif should be
+	public static boolean renderCPoint = false;
+	public static int frames = 100;//how long the gif should be
 	public static boolean record = true; //Whether or not to save it as gif
 	
 	//generates one frame.
@@ -64,11 +62,11 @@ public class Generator {
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			savePic(pix, "images/"+timestamp+".png");//save pictures now and then
 		}
-		for(int dx = 0; dx < 2; dx++)for(int dy = 0; dy < 2; dy++) {
-			int xvalhere = width/2+dx+(int)(cpow.x*width/10.), yvalhere = height/2+dy-(int)(cpow.y*height/10.);
-			if(renderCPoint && xvalhere > 0 && xvalhere < width && yvalhere > 0 && yvalhere < height) pix[xvalhere+(yvalhere)*width] = 0xffffff;//center pixel white
-			pix[width/2+dx+(height/2+dy)*width] = 0xffffff;//center pixel white
-		}
+//		for(int dx = 0; dx < 2; dx++)for(int dy = 0; dy < 2; dy++) {
+//			int xvalhere = width/2+dx+(int)(cpow.x*width/10.), yvalhere = height/2+dy-(int)(cpow.y*height/10.);
+//			if(renderCPoint && xvalhere > 0 && xvalhere < width && yvalhere > 0 && yvalhere < height) pix[xvalhere+(yvalhere)*width] = 0xffffff;//center pixel white
+//			pix[width/2+dx+(height/2+dy)*width] = 0xffffff;//center pixel white
+//		}
 		c.zoom(pix, width, height, time);//tick controller
 		return pix;
 	}
@@ -113,8 +111,8 @@ public class Generator {
 	}
 
 	//the actual mandelbrot computation
-	private static int computeDepth(double r, double i) {
-		double editI = i, editR = r, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
+	private static int computeDepth(double rZ, double iZ, double rC, double iC, double rX, double iX) {
+		double editI = iZ, editR = rZ, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
 		boolean diverged = false; // whether or not we have exited the radius 2 origin circle yet
 		int divergeCount = 0; // iteration counter
 
@@ -122,28 +120,28 @@ public class Generator {
 			if (ei2+er2 > 4) diverged = true; //out of circle
 			divergeCount++;
 			double newR, newI;
-			if (usingComplexPower){
-				Complex c = new Complex(editR, editI).pow(cpow); //arbitrary complex power
+			if (iX != 0){
+				Complex c = new Complex(editR, editI).pow(new Complex(rX,iX)); //arbitrary complex power
 				newR = c.x;
 				newI = c.y;
-			} else if (pow == 2) {
+			} else if (rX == 2) {
 				newR = er2 - ei2;
 				newI = editI * editR; //square the complex
 				newI += newI;
-			} else if (pow == -1) {
+			} else if (rX == -1) {
 				double div = 1 / (er2+ei2);
 				newR = editR*div; //reciprocal it
 				newI = -editI*div;
-			} else if (pow == 3) {
+			} else if (rX == 3) {
 				newR = editR * er2 - 3 * editR * ei2;
 				newI = (er2 + er2 + er2 - ei2) * editI; //cube it
 			} else {
-				Complex c = new Complex(editR, editI).pow(pow); //arbitrary real power
+				Complex c = new Complex(editR, editI).pow(new Complex(rX,iX)); //arbitrary real power
 				newR = c.x;
 				newI = c.y;
 			}
-			editI = newI + i; //add c
-			editR = newR + r;
+			editI = newI + iC; //add c
+			editR = newR + rC;
 			ei2 = editI * editI; //update squares
 			er2 = editR * editR;
 			if (divergeCount > c.searchDepth) break;
@@ -158,9 +156,9 @@ public class Generator {
 	private static boolean doPixel(int x, int y, int[] pix) {
 		double rotX = (x - width / 2) * Math.cos(c.angle) - (y - height / 2) * Math.sin(c.angle);
 		double rotY = (x - width / 2) * Math.sin(c.angle) + (y - height / 2) * Math.cos(c.angle);
-		double nPart = rotX / (c.zoom) + c.x;
+		double rPart = rotX / (c.zoom) + c.x;
 		double iPart = rotY / (c.zoom) + c.y;// width, zoom is in terms of width. Stretched otherwise.
-		int depth = computeDepth(nPart, iPart);
+		int depth = computeDepth(c.r0, c.i0, 0, 0, rPart, iPart);
 		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth);
 		return depth == -1;
 	}

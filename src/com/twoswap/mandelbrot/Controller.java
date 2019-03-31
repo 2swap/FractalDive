@@ -1,14 +1,13 @@
-package com.Marduk.mandelbrot;
-
-import com.Marduk.mandelbrot.extras.Complex;
+package com.twoswap.mandelbrot;
 
 //Controls where the generator looks for
 public class Controller {
 	
-	double x, y, zoom = 50, angle = 0;//coordinates and zoom level
+	double x, y, zoom = 10, angle = 0;//coordinates and zoom level
 	public boolean drift; //looks for interesting spots
 	public double speed = 1, zoomSpeed = 1.05, va = 0;//speed of camera convergence to target, speed of zoom
 	public int searchDepth = 50;
+	public double r0 = 0, i0 = 0;
 	
 	//Known interesting spots
 	//fx = -0.750045367143, fy = -0.004786271734;
@@ -42,10 +41,19 @@ public class Controller {
 	
 	//called after every tick
 	public void zoom(int[] last, int w, int h, int t) {
-		//double q = t*.03;
-		//Generator.cpow = new Complex(q,q/5.*Math.sin(q*5));
-		//System.out.println(Generator.cpow);
-		angle += va;//rotate appropriately
+		double q = t;
+		//r0 = .25 * Math.cos(q) - 1;
+		//i0 = .25 * Math.sin(q); // left cir
+        //double tx = .25 * Math.cos(runs / 512.0) - 1, ty = .25 * Math.sin(runs / 512.0); // left cir
+        //double tx = .1 * Math.cos(runs / 10.0)-.125, ty = .1 * Math.sin(runs / 10.0) - .75; // top cir
+        //double tx = .75 * Math.cos(runs / 10.0), ty = .75 * Math.sin(runs / 10.0); // main bulb
+		//r0 = q*Math.cos(q);
+		//i0 = q*Math.sin(q);//spiral
+		//r0 = Math.cos(q);
+		//i0 = Math.sin(q);//circle
+		r0 = 1+Math.exp(-q);
+		i0 = 0;
+		//angle += va;//rotate appropriately
 		zoom *= zoomSpeed;//zoom in
 		
 		if(drift) {
@@ -58,8 +66,8 @@ public class Controller {
 				double rotX = (x - w / 2) * Math.cos(angle) - (y - h / 2) * Math.sin(angle);//un-rotate to figure out the actual coordinates in mandelbrot-space, not in screen-space
 				double rotY = (x - w / 2) * Math.sin(angle) + (y - h / 2) * Math.cos(angle);
 				double dist = 1+Math.sqrt(square(x-w/2)+square(y-h/2));
-				avgx += square(sum) * Math.cbrt(rotX) * 8 / dist;//tweak our velocity based on interestingness of (x,y)
-				avgy += square(sum) * Math.cbrt(rotY) * 8 / dist;
+				avgx += square(sum) * Math.cbrt(rotX) * 60 / dist;//tweak our velocity based on interestingness of (x,y)
+				avgy += square(sum) * Math.cbrt(rotY) * 60 / dist;
 			}
 			avgx /= w*h;//shouldn't be screensize dependent
 			avgy /= w*h;
@@ -79,10 +87,10 @@ public class Controller {
 	
 	//move to a random point on the unit circle
 	public void randomize() {
-		zoom = 50;
-		va = Math.random()*.04-.02;
-		double theta = 2*Math.PI*Math.random();
-		x = Math.cos(theta);
-		y = Math.sin(theta);
+		zoom = 10;
+		//va = Math.random()*.04-.02;
+		double theta = 0;//2*Math.PI*Math.random();
+		x = Math.cos(theta)*1.2;
+		y = Math.sin(theta)*1.2;
 	}
 }

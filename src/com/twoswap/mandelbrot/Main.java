@@ -1,4 +1,4 @@
-package com.Marduk.mandelbrot;
+package com.twoswap.mandelbrot;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -9,7 +9,7 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-import com.Marduk.mandelbrot.extras.Gif;
+import com.twoswap.mandelbrot.extras.Gif;
 
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;

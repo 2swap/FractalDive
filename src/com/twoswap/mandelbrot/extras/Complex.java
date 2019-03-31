@@ -1,4 +1,4 @@
-package com.Marduk.mandelbrot.extras;
+package com.twoswap.mandelbrot.extras;
 
 // Complex.java
 

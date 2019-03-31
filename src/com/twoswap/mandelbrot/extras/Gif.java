@@ -1,4 +1,4 @@
-package com.Marduk.mandelbrot.extras;
+package com.twoswap.mandelbrot.extras;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,7 +16,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
-import com.Marduk.mandelbrot.Generator;
+import com.twoswap.mandelbrot.Generator;
 
 public abstract class Gif {
 	
