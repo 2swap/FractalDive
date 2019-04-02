@@ -48,25 +48,38 @@ public class Styler {
 	}
 	
 	//get a color from a depth and time, depending on style
-	public int getColor(int depth, int time, int lastMinDepth, int lastMaxDepth) {
+	public int getColor(int depth, int time, int lastMinDepth, int lastMaxDepth, double rZ, double iZ) {
 		int r = 0, g = 0, b = 0;
 		boolean background = false;
 		if (depth == -2) r = g = b = 255; //error
 		if (depth >= 0) {// if it's not in the set
 			if (type.contains("inset")) {
-				r = 255;
-				g = 255;
-				b = 255;
+				r = g = b = 255;
+			}
+			if (type.contains("domain")) {
+				double theta = Math.atan2(iZ, rZ)*2;
+				double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
+				double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
+				double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
+
+				double d = Math.sqrt(rZ+iZ) - 2;
+				double scaler = d/4;
+				r = (int) (ro*scaler);
+				g = (int) (go*scaler);
+				b = (int) (bo*scaler);
+			}
+			if (type.contains("longjump")) {
+				double d = Math.sqrt(rZ+iZ) - 2;
+				if(d < 0 || d > 4)System.out.println(d);
+				r = (int) (d/4*255);
+				g = (int) (d/4*255);
+				b = (int) (d/4*255);
 			}
 			if (type.contains("contrast")) {
-				r = depth%2*255;
-				g = depth%2*255;
-				b = depth%2*255;
+				r = g = b = depth%2*255;
 			}
 			if (type.contains("light")) {
-				r = (int) (square(((FastMath.atan((depth - lastMinDepth + 1) / FastMath.pow(2, 0)) / Math.PI * 512)))/256.);
-				g = (int) (square(((FastMath.atan((depth - lastMinDepth + 1) / FastMath.pow(2, 0)) / Math.PI * 512)))/256.);
-				b = (int) (square(((FastMath.atan((depth - lastMinDepth + 1) / FastMath.pow(2, 0)) / Math.PI * 512)))/256.);
+				r = g = b = (int) (square(((FastMath.atan((depth - lastMinDepth + 1) / FastMath.pow(2, 0)) / Math.PI * 512)))/256.);
 			}
 			if (type.contains("deepbow")) {
 				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time)) / 3) + 128);
@@ -117,6 +130,10 @@ public class Styler {
 		return x*x;
 	}
 	
+	public static int lerpInt(int a, int b, double w){
+		return (int) (a*w+b*(w-1));
+	}
+	
 	//linear interpolate between two colors
 	public static int colorLerp(int a, int b, double w) {
 		int r1 = (a&0xff0000)>>16;
@@ -125,7 +142,7 @@ public class Styler {
 		int r2 = (b&0xff0000)>>16;
 		int g2 = (b&0xff00)>>8;
 		int b2 = b&0xff;
-		return ((int)(r1*w+r2*(1-w))<<16)+((int)(g1*w+g2*(1-w))<<8)+(int)(b1*w+b2*(1-w));
+		return (lerpInt(r1,r2,w)<<16)+(lerpInt(g1,g2,w)<<8)+lerpInt(b1,b2,w);
 	}
 	
 	public void randomize() {

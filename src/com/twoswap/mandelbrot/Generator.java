@@ -17,14 +17,13 @@ public class Generator {
 	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
-	public static int width = 128, height = 128; //screen size
+	public static int width = 256, height = 256; //screen size
 	public static boolean renderCPoint = false;
 	public static int frames = 200;//how long the gif should be
 	public static boolean record = true; //Whether or not to save it as gif
 	
 	//generates one frame.
 	public static int[] generate() {
-		if(time == 0) Generator.setupMagicPalette();
 		minDepth = 10000000;
 		maxDepth = 0; //keep track of our min and max depths reached
 		
@@ -60,8 +59,8 @@ public class Generator {
 		lastMinDepth = minDepth;//update these for controller
 		lastMaxDepth = maxDepth;
 		if(Math.random() < .001) {
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			savePic(pix, "images/"+timestamp+".png");//save pictures now and then
+			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			savePic(pix, "images/"+System.currentTimeMillis()+".png");//save pictures now and then
 		}
 //		for(int dx = 0; dx < 2; dx++)for(int dy = 0; dy < 2; dy++) {
 //			int xvalhere = width/2+dx+(int)(cpow.x*width/10.), yvalhere = height/2+dy-(int)(cpow.y*height/10.);
@@ -112,13 +111,13 @@ public class Generator {
 	}
 
 	//the actual mandelbrot computation
-	private static int computeDepth(double rZ, double iZ, double rC, double iC, double rX, double iX) {
+	private static int computeDepth(double rZ, double iZ, double rC, double iC, double rX, double iX, double[] outCoords) {
 		double editI = iZ, editR = rZ, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
 		boolean diverged = false; // whether or not we have exited the radius 2 origin circle yet
 		int divergeCount = 0; // iteration counter
 
 		while (!diverged) {
-			if (ei2+er2 > 4) diverged = true; //out of circle
+			if (ei2+er2 > 4){diverged = true;break;} //out of circle
 			divergeCount++;
 			double newR, newI;
 			if (iX != 0){
@@ -151,6 +150,8 @@ public class Generator {
 		if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth+=100;
 		if (diverged) minDepth = Math.min(minDepth, divergeCount);
 		if (diverged) maxDepth = Math.max(maxDepth, divergeCount);
+		outCoords[0] = er2;
+		outCoords[1] = ei2;
 		return diverged?divergeCount:-1;
 	}
 
@@ -166,8 +167,9 @@ public class Generator {
 //	rPart = pointDist * Math.sin(pointAng);
 //	iPart = pointDist * Math.cos(pointAng);
 		
-		int depth = computeDepth(0, 0, rPart, iPart, 2, 0);
-		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth);
+		double outCoords[] = new double[2];
+		int depth = computeDepth(rPart, iPart, c.r0, c.i0, 2, 0, outCoords);
+		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		return depth == -1;
 	}
 
@@ -183,7 +185,7 @@ public class Generator {
 	}
 	
 	public static void setupMagicPalette() {
-		s = new Styler(new File("Chris.png"));
+		s = new Styler(new File("Harrison.png"));
 		c = new Controller(.25009989470767,0.00000159156228,1.03,10000000000000d);
 		c.searchDepth = 40000;
 		c.va = 0.003;

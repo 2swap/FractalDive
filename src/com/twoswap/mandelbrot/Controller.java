@@ -42,8 +42,8 @@ public class Controller {
 	//called after every tick
 	public void zoom(int[] last, int w, int h, int t) {
 		double q = 4*(t/200.-.5);
-		//r0 = .25 * Math.cos(q) - 1;
-		//i0 = .25 * Math.sin(q); // left cir
+		r0 = .25 * Math.cos(q) - 1;
+		i0 = .25 * Math.sin(q); // left cir
         //double tx = .25 * Math.cos(runs / 512.0) - 1, ty = .25 * Math.sin(runs / 512.0); // left cir
         //double tx = .1 * Math.cos(runs / 10.0)-.125, ty = .1 * Math.sin(runs / 10.0) - .75; // top cir
         //double tx = .75 * Math.cos(runs / 10.0), ty = .75 * Math.sin(runs / 10.0); // main bulb
@@ -51,8 +51,8 @@ public class Controller {
 		//i0 = q*Math.sin(q);//spiral
 		//r0 = Math.cos(q);
 		//i0 = Math.sin(q);//circle
-		r0 = q;
-		i0 = 0;
+		//r0 = q;
+		//i0 = 0;
 		angle += va;//rotate appropriately
 		zoom *= zoomSpeed;//zoom in
 		
@@ -62,7 +62,7 @@ public class Controller {
 			for(int x = 1*w/8; x <= 7*w/8; x++) for(int y = 1*h/8; y <= 7*h/8; y++) { //iterate over the middle of the screen (not whole screen, that moves too fast)
 				double sum = -5.5+Math.sin(t/80.)*2; //Too confusing for a one-line comment, ask alex if you wanna know what this does
 				for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++)//iterate over immediate vicinity
-					if( !(x == 0 && y == 0) && last[x+y*w]!=last[x+dx+(y+dy)*w]) sum++;//if x+dx,y+dy =/= x,y then increment sum
+					if( !(x == 0 && y == 0) && colDist(last[x+y*w],last[x+dx+(y+dy)*w])) sum++;//if x+dx,y+dy =/= x,y then increment sum
 				double rotX = (x - w / 2) * Math.cos(angle) - (y - h / 2) * Math.sin(angle);//un-rotate to figure out the actual coordinates in mandelbrot-space, not in screen-space
 				double rotY = (x - w / 2) * Math.sin(angle) + (y - h / 2) * Math.cos(angle);
 				double dist = 1+Math.sqrt(square(x-w/2)+square(y-h/2));
@@ -80,6 +80,17 @@ public class Controller {
 		return x*x;
 	}
 	
+	public static boolean colDist(int c1, int c2){
+		int r1, g1, b1, r2, g2, b2;
+		r1 = c1 / 0x10000 % 0x100;
+		g1 = c1 / 0x100   % 0x100;
+		b1 = c1 / 0x1     % 0x100;
+		r2 = c2 / 0x10000 % 0x100;
+		g2 = c2 / 0x100   % 0x100;
+		b2 = c2 / 0x1     % 0x100;
+		return (Math.abs(r1-r2)+Math.abs(b1-b2)+Math.abs(g1-g2)) < 20;
+	}
+	
 	//linear interpolation
 	public static double lerp(double a, double b, double w) {
 		return a*w+b*(1-w);
@@ -89,7 +100,7 @@ public class Controller {
 	public void randomize() {
 		zoom = 10;
 		//va = Math.random()*.04-.02;
-		double theta = 0;//2*Math.PI*Math.random();
+		double theta = 2*Math.PI*Math.random();
 		x = Math.cos(theta)*1.2;
 		y = Math.sin(theta)*1.2;
 	}
