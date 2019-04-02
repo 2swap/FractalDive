@@ -51,17 +51,12 @@ class DimPanel extends Panel {
 		c.setBackground(Color.WHITE);
 		c.setBounds(16,16,128,128);
 	}
-	public void paint(Graphics g){
-		g.setColor(Color.red);
-		g.fillOval(75, 75, 150, 75);
-	}
 }
 class DimCanvas extends Canvas{
 	int plane = 0;
 	public DimCanvas() {
 		setBackground(Color.WHITE);
 		setBounds(16,16,128,128);
-		plane = type;
 	}
 	public void paint(Graphics g){
 		g.setColor(Color.red);
