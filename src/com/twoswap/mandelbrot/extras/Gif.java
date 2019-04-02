@@ -113,8 +113,8 @@ public abstract class Gif {
 		for (int i = 0; i < Generator.frames; i++)
 			imgs[i] = "giffer/img" + i + ".png";
 		try {
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			Gif.generateFromFiles(imgs, "outputGifs/"+timestamp+".gif", 3, true);
+			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			Gif.generateFromFiles(imgs, "outputGifs/"+System.currentTimeMillis()+".gif", 3, true);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

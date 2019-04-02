@@ -94,5 +94,6 @@ public class Main extends Canvas implements Runnable {
 		frame.setResizable(false);
 		frame.setVisible(true);
 		main.start();
+		Generator.setupMagicPalette();
 	}
 }

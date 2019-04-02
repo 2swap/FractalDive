@@ -17,13 +17,14 @@ public class Generator {
 	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
-	public static int width = 256, height = 256; //screen size
+	public static int width = 128, height = 128; //screen size
 	public static boolean renderCPoint = false;
 	public static int frames = 200;//how long the gif should be
 	public static boolean record = true; //Whether or not to save it as gif
 	
 	//generates one frame.
 	public static int[] generate() {
+		if(time == 0) Generator.setupMagicPalette();
 		minDepth = 10000000;
 		maxDepth = 0; //keep track of our min and max depths reached
 		
@@ -160,10 +161,10 @@ public class Generator {
 		double iPart = rotY / (c.zoom) + c.y;// width, zoom is in terms of width. Stretched otherwise.
 		
 		//this is for last minute changes to pixel coords.
-		double pointAng = Math.atan2(rPart, iPart);
-		double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
-		rPart = pointDist * Math.sin(pointAng);
-		iPart = pointDist * Math.cos(pointAng);
+//	double pointAng = Math.atan2(rPart, iPart);
+//	double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
+//	rPart = pointDist * Math.sin(pointAng);
+//	iPart = pointDist * Math.cos(pointAng);
 		
 		int depth = computeDepth(0, 0, rPart, iPart, 2, 0);
 		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth);
@@ -182,10 +183,9 @@ public class Generator {
 	}
 	
 	public static void setupMagicPalette() {
-		s = new Styler(new File("Bop.png"));
-		c = new Controller(.25009989470767,0.00000159156228,10000000000000d);
+		s = new Styler(new File("Chris.png"));
+		c = new Controller(.25009989470767,0.00000159156228,1.03,10000000000000d);
 		c.searchDepth = 40000;
-		c.zoomSpeed = 1.03;
 		c.va = 0.003;
 		frames = 61;
 	}

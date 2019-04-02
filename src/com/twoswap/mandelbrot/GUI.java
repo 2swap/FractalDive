@@ -62,20 +62,20 @@ class DimCanvas extends Canvas{
 		g.setColor(Color.red);
 		g.fillOval(75, 75, 150, 75);
 	}
-	private void render() {
-		BufferStrategy bs = this.getBufferStrategy();
-		if (bs == null) {
-			createBufferStrategy(3);
-			return;
-		}
-		int[] pix = Generator.generate();
-		for (int i = 0; i < Generator.width * Generator.height; i++)
-			pixels[i] = pix[i];
-		if (Generator.record && Generator.time > 1)
-			Generator.savePic(pix, "giffer/img" + (Generator.time - 2) + ".png");
-		Graphics g = bs.getDrawGraphics();
-		g.drawImage(img, 0, 0, Generator.width + 10, Generator.height + 10, null);
-		g.dispose();
-		bs.show();
-	}
+//	private void render() {
+//		BufferStrategy bs = this.getBufferStrategy();
+//		if (bs == null) {
+//			createBufferStrategy(3);
+//			return;
+//		}
+//		int[] pix = Generator.generate();
+//		//for (int i = 0; i < Generator.width * Generator.height; i++)
+//			//pixels[i] = pix[i];
+//		if (Generator.record && Generator.time > 1)
+//			Generator.savePic(pix, "giffer/img" + (Generator.time - 2) + ".png");
+//		Graphics g = bs.getDrawGraphics();
+//		g.drawImage(img, 0, 0, Generator.width + 10, Generator.height + 10, null);
+//		g.dispose();
+//		bs.show();
+//	}
 }

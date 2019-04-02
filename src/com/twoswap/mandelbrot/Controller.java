@@ -53,7 +53,7 @@ public class Controller {
 		//i0 = Math.sin(q);//circle
 		r0 = q;
 		i0 = 0;
-		//angle += va;//rotate appropriately
+		angle += va;//rotate appropriately
 		zoom *= zoomSpeed;//zoom in
 		
 		if(drift) {
