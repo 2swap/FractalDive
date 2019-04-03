@@ -5,9 +5,10 @@ public class Controller {
 	
 	double x, y, zoom = 10, angle = 0;//coordinates and zoom level
 	public boolean drift; //looks for interesting spots
-	public double speed = 1, zoomSpeed = 1.05, va = 0;//speed of camera convergence to target, speed of zoom
-	public int searchDepth = 50;
-	public double r0 = 0, i0 = 0;
+	public double speed = 10, zoomSpeed = 1, va = 0;//speed of camera convergence to target, speed of zoom
+	public int searchDepth = 50, set = 0;
+	public double rC = 0, iC = 0, rZ = 0, iZ = 0, rX = 2, iX = 0;
+	public double iDrift = 0, rDrift = 0;
 	
 	//Known interesting spots
 	//fx = -0.750045367143, fy = -0.004786271734;
@@ -42,8 +43,8 @@ public class Controller {
 	//called after every tick
 	public void zoom(int[] last, int w, int h, int t) {
 		double q = 4*(t/200.-.5);
-		r0 = .25 * Math.cos(q) - 1;
-		i0 = .25 * Math.sin(q); // left cir
+		//rC = .25 * Math.cos(q) - 1;
+		//iC = .25 * Math.sin(q); // left cir
         //double tx = .25 * Math.cos(runs / 512.0) - 1, ty = .25 * Math.sin(runs / 512.0); // left cir
         //double tx = .1 * Math.cos(runs / 10.0)-.125, ty = .1 * Math.sin(runs / 10.0) - .75; // top cir
         //double tx = .75 * Math.cos(runs / 10.0), ty = .75 * Math.sin(runs / 10.0); // main bulb
@@ -59,20 +60,24 @@ public class Controller {
 		if(drift) {
 			//change coords towards a more interesting spot
 			double avgx = 0, avgy = 0;
-			for(int x = 1*w/8; x <= 7*w/8; x++) for(int y = 1*h/8; y <= 7*h/8; y++) { //iterate over the middle of the screen (not whole screen, that moves too fast)
-				double sum = -5.5+Math.sin(t/80.)*2; //Too confusing for a one-line comment, ask alex if you wanna know what this does
+			int pixelsChecked = 0;
+			for(int px = 1; px < w-1; px++) for(int py = 1; py < h-1; py++) { //iterate over the middle of the screen (not whole screen, that moves too fast)
+				double sum = -6+Math.sin(t/80.)*1.5; //Set weight for what we're looking for
 				for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++)//iterate over immediate vicinity
-					if( !(x == 0 && y == 0) && colDist(last[x+y*w],last[x+dx+(y+dy)*w])) sum++;//if x+dx,y+dy =/= x,y then increment sum
-				double rotX = (x - w / 2) * Math.cos(angle) - (y - h / 2) * Math.sin(angle);//un-rotate to figure out the actual coordinates in mandelbrot-space, not in screen-space
-				double rotY = (x - w / 2) * Math.sin(angle) + (y - h / 2) * Math.cos(angle);
-				double dist = 1+Math.sqrt(square(x-w/2)+square(y-h/2));
-				avgx += square(sum) * Math.cbrt(rotX) * 60 / dist;//tweak our velocity based on interestingness of (x,y)
-				avgy += square(sum) * Math.cbrt(rotY) * 60 / dist;
+					if( !(dx == 0 && dy == 0) && colDist(last[px+py*w],last[px+dx+(py+dy)*w])) sum++;//if x+dx,y+dy =/= x,y then increment sum
+				double rotX = (px - w / 2.) * Math.cos(angle) - (py - h / 2.) * Math.sin(angle);//un-rotate to figure out the actual coordinates in mandelbrot-space, not in screen-space
+				double rotY = (px - w / 2.) * Math.sin(angle) + (py - h / 2.) * Math.cos(angle);
+				double dist = 1+Math.sqrt(square(px-w/2.)+square(py-h/2.));
+				avgx += sum * Math.cbrt(rotX);//tweak our velocity based on interestingness of (x,y)
+				avgy += sum * Math.cbrt(rotY);
+				pixelsChecked++;
 			}
-			avgx /= w*h;//shouldn't be screensize dependent
-			avgy /= w*h;
-			x += speed*lerp(-1/zoom,1/zoom,avgx);//move appropriately
-			y += speed*lerp(-1/zoom,1/zoom,avgy);
+			avgx /= pixelsChecked;//shouldn't be screensize dependent
+			avgy /= pixelsChecked;
+			rDrift = lerp(rDrift,speed*(1./zoom)*avgx,.2);//move appropriately
+			iDrift = lerp(iDrift,speed*(1./zoom)*avgy,.2);
+			x+=rDrift;
+			y+=iDrift;
 		}
 	}
 	
@@ -88,7 +93,7 @@ public class Controller {
 		r2 = c2 / 0x10000 % 0x100;
 		g2 = c2 / 0x100   % 0x100;
 		b2 = c2 / 0x1     % 0x100;
-		return (Math.abs(r1-r2)+Math.abs(b1-b2)+Math.abs(g1-g2)) < 20;
+		return (Math.abs(r1-r2)+Math.abs(b1-b2)+Math.abs(g1-g2)) > 10;
 	}
 	
 	//linear interpolation

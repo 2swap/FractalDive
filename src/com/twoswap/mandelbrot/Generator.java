@@ -3,7 +3,6 @@ package com.twoswap.mandelbrot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.imageio.ImageIO;
 
@@ -12,14 +11,14 @@ import com.twoswap.mandelbrot.extras.Complex;
 public class Generator {
 
 	//dont touch stuff in this block
-	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0;//some stuff the program keeps track of
+	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0, iterations = 0;//some stuff the program keeps track of
 	public static Styler s = new Styler("rainbow",.2); //The look of the palette and such
 	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
-	public static int width = 256, height = 256; //screen size
+	public static int width = 512, height = 512; //screen size
 	public static boolean renderCPoint = false;
-	public static int frames = 200;//how long the gif should be
+	public static int frames = 800;//how long the gif should be
 	public static boolean record = true; //Whether or not to save it as gif
 	
 	//generates one frame.
@@ -111,7 +110,7 @@ public class Generator {
 	}
 
 	//the actual mandelbrot computation
-	private static int computeDepth(double rZ, double iZ, double rC, double iC, double rX, double iX, double[] outCoords) {
+	public static int computeDepth(double rC, double iC, double rZ, double iZ, double rX, double iX, int its, double[] outCoords) {
 		double editI = iZ, editR = rZ, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
 		boolean diverged = false; // whether or not we have exited the radius 2 origin circle yet
 		int divergeCount = 0; // iteration counter
@@ -144,10 +143,10 @@ public class Generator {
 			editR = newR + rC;
 			ei2 = editI * editI; //update squares
 			er2 = editR * editR;
-			if (divergeCount > c.searchDepth) break;
+			if (divergeCount > iterations) break;
 		}
 		if(!diverged) divergeCount = 0;
-		if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth+=100;
+		//if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth++;
 		if (diverged) minDepth = Math.min(minDepth, divergeCount);
 		if (diverged) maxDepth = Math.max(maxDepth, divergeCount);
 		outCoords[0] = er2;
@@ -168,7 +167,7 @@ public class Generator {
 //	iPart = pointDist * Math.cos(pointAng);
 		
 		double outCoords[] = new double[2];
-		int depth = computeDepth(rPart, iPart, c.r0, c.i0, 2, 0, outCoords);
+		int depth = computeDepth(c.set==0?rPart:c.rC, c.set==0?iPart:c.iC, c.set==1?rPart:c.rZ, c.set==1?iPart:c.iZ, c.set==2?rPart:c.rX, c.set==2?iPart:c.iX, c.searchDepth*iterations, outCoords);
 		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		return depth == -1;
 	}
