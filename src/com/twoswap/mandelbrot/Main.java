@@ -11,10 +11,9 @@ public class Main extends Canvas implements Runnable {
 
 	private static  boolean running = false;
 	private Thread thread;
-	private GUI gui;
 
 	public Main() {
-		gui = new GUI();
+		new GUI();
 	}
 
 	public synchronized void start() {
@@ -47,7 +46,7 @@ public class Main extends Canvas implements Runnable {
 		if (Generator.record && Generator.time-1 == Generator.frames) {
 			Gif.run();
 			running = false;
-			System.out.println("Final x: "+Generator.c.x+" Final y: "+Generator.c.y);
+			System.out.println("Final x: "+Controller.x+" Final y: "+Controller.y);
 		}
 		GUI.render();
 	}

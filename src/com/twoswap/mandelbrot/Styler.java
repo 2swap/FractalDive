@@ -10,28 +10,17 @@ import net.jafama.FastMath;
 
 public class Styler {
 
-	public double inhale = 0;//how fast the colors should go in(-) or out(+)
-	public String type = "rainbow";//the way it looks
+	public static double inhale = 0;//how fast the colors should go in(-) or out(+)
+	public static String type = "rainbow";//the way it looks
 
 	//for image palettes
-	public int cycleWidth = 1, cycleHeight = 1;
-	public int[][] cycler;
+	public static int cycleWidth = 1, cycleHeight = 1;
+	public static int[][] cycler;
 	
 	public static String[] styles = {"rainbow", "deepbow", "cycle"};//, "light"};//a list of styles for random selection
-
-	public Styler(String type, double inhale) {
-		this.inhale = inhale;
-		this.type = type;
-		inventCycle();
-	}
-	
-	public Styler() {
-		randomize();
-		inventCycle();
-	}
 	
 	//initialize with a magic palette image
-	public Styler(File f) {
+	public static void initPalette(File f) {
 		type = "magicpalette";
 		BufferedImage img = null;
 		try{
@@ -48,45 +37,66 @@ public class Styler {
 	}
 	
 	//get a color from a depth and time, depending on style
-	public int getColor(int depth, int time, int lastMinDepth, int lastMaxDepth, double rZ, double iZ) {
+	public static int getColor(int depth, int time, int lastMinDepth, int lastMaxDepth, double rZ, double iZ) {
 		int r = 0, g = 0, b = 0;
 		boolean background = false;
 		if (depth == -2) r = g = b = 255; //error
 		if (depth >= 0) {// if it's not in the set
-			if (type.contains("inset")) {
-				r = g = b = 255;
-			}
-			if (type.contains("domain")) {
+			r = g = b = 255;
+			if (type.equals("rawhsv")) {
 				double theta = Math.atan2(iZ, rZ)*2;
 				double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
 				double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
 				double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
 
-				double d = Math.sqrt(rZ+iZ) - 2;
+				double d = Math.sqrt(rZ*rZ+iZ*iZ);
 				double scaler = d/4;
 				r = (int) (ro*scaler);
 				g = (int) (go*scaler);
 				b = (int) (bo*scaler);
 			}
-			if (type.contains("longjump")) {
-				double d = Math.sqrt(rZ+iZ) - 2;
+			if (type.equals("sinhsv")) {
+				double theta = Math.atan2(iZ, rZ)*2;
+				double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
+				double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
+				double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
+
+				double d = Math.sqrt(rZ*rZ+iZ*iZ) - 2;
+				double scaler = Math.sin((d-.5)*Math.PI)/2+.5;
+				r = (int) (ro*scaler);
+				g = (int) (go*scaler);
+				b = (int) (bo*scaler);
+			}
+			if (type.equals("image")) {
+				//TODO:Repeats an image, warped by the set
+			}
+			if (type.equals("longjump")) {
+				double d = Math.sqrt(rZ*rZ+iZ*iZ) - 2;
 				if(d < 0 || d > 4)System.out.println(d);
 				r = (int) (d/4*255);
 				g = (int) (d/4*255);
 				b = (int) (d/4*255);
 			}
-			if (type.contains("contrast")) {
+			if (type.equals("contrast")) {
 				r = g = b = depth%2*255;
 			}
-			if (type.contains("light")) {
-				r = g = b = (int) (square(((FastMath.atan((depth - lastMinDepth + 1) / FastMath.pow(2, 0)) / Math.PI * 512)))/256.);
+			if (type.equals("light")) {
+				double num = ((double)depth - lastMinDepth)/(lastMaxDepth - lastMinDepth);
+				r = g = b = (int) (Math.sqrt(num)*256);
 			}
-			if (type.contains("deepbow")) {
-				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time)) / 3) + 128);
-				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 2 / 3)) / 3) + 128);
-				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 4 / 3)) / 3) + 128);
+			if(type.equals("undark")) {
+				double shader = Math.exp(-5*(depth-lastMinDepth)/(.01+lastMaxDepth-lastMinDepth));
+				r=(int) (255-r*shader);
+				g=(int) (255-g*shader);
+				b=(int) (255-b*shader);
 			}
-			if (type.contains("cycle")) {
+			if(type.equals("dark")) {
+				double shader = Math.exp(-5*(depth-lastMinDepth)/(.01+lastMaxDepth-lastMinDepth));
+				r*=shader;
+				g*=shader;
+				b*=shader;
+			}
+			if (type.equals("cycle")) {
 				double d = depth + inhale * time;
 				while(d<0)d+=10;
 				int col1 = cycler[(int) ((d/5)%cycleWidth)][0];
@@ -96,30 +106,39 @@ public class Styler {
 				g = (col&0xff00)>>8;
 				b = col&0xff;
 			}
-			if (type.contains("magicpalette")) {
+			if (type.equals("magicpalette")) {
 				int col = cycler[depth/5%cycleWidth][depth/5/cycleWidth%cycleHeight];
 				background = (col&0xffffff) == 0xabcdef;
 				r = (col&0xff0000)>>16;
 				g = (col&0xff00)>>8;
 				b = col&0xff;
 			}
-			if (type.contains("rainbow") || background) {
+			if (type.equals("oldbow")) {
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 0. / 3)) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 2. / 3)) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 4. / 3)) / 3) + 128);
+			}
+			if (type.equals("popbow")) {
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale*time) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale*time) / 3) + 128);
+			}
+			if (type.equals("deepbow")) {
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale*time) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale*time) / 3) + 128);
+			}
+			if (type.equals("rainbow") || background) {
 				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale*time) / 3) + 128);
 				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
 				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale*time) / 3) + 128);
-			}
-			if(type.contains("dark")) {
-				double shader = Math.exp(-5*(depth-lastMinDepth)/(.01+lastMaxDepth-lastMinDepth));
-				r*=shader;
-				g*=shader;
-				b*=shader;
 			}
 		}
 		return r*0x10000+g*0x100+b;
 	}
 	
 	//generate a random color cycle to be looped through
-	public void inventCycle() {
+	public static void inventCycle() {
 		cycleHeight = 1;
 		cycleWidth = (int) (Math.random()*3+3);
 		cycler = new int[cycleWidth][1];
@@ -145,7 +164,7 @@ public class Styler {
 		return (lerpInt(r1,r2,w)<<16)+(lerpInt(g1,g2,w)<<8)+lerpInt(b1,b2,w);
 	}
 	
-	public void randomize() {
+	public static void randomize() {
 		type = styles[(int)(Math.random()*styles.length)];// + (Math.random()<.5?"dark":"");
 		inhale = (Math.random()*.8-.4);
 		System.out.println("Style: " + type);

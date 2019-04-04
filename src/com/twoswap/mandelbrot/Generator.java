@@ -12,14 +12,11 @@ public class Generator {
 
 	//dont touch stuff in this block
 	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0, iterations = 0;//some stuff the program keeps track of
-	public static Styler s = new Styler("rainbow",.2); //The look of the palette and such
-	public static Controller c = new Controller(); //The thing that controls the motion of the zoom
 	
 	//Settings for zooms- change away!
 	public static int width = 512, height = 512; //screen size
-	public static boolean renderCPoint = false;
 	public static int frames = 800;//how long the gif should be
-	public static boolean record = true; //Whether or not to save it as gif
+	public static boolean record = false; //Whether or not to save it as gif
 	
 	//generates one frame.
 	public static int[] generate() {
@@ -54,7 +51,7 @@ public class Generator {
 		
 		
 		
-		if(++time%10==0)System.out.println(time + " " + c.searchDepth);
+		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
 		lastMinDepth = minDepth;//update these for controller
 		lastMaxDepth = maxDepth;
 		if(Math.random() < .001) {
@@ -66,7 +63,7 @@ public class Generator {
 //			if(renderCPoint && xvalhere > 0 && xvalhere < width && yvalhere > 0 && yvalhere < height) pix[xvalhere+(yvalhere)*width] = 0xffffff;//center pixel white
 //			pix[width/2+dx+(height/2+dy)*width] = 0xffffff;//center pixel white
 //		}
-		c.zoom(pix, width, height, time);//tick controller
+		Controller.zoom(pix, width, height, time);//tick controller
 		return pix;
 	}
 	
@@ -149,16 +146,16 @@ public class Generator {
 		//if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth++;
 		if (diverged) minDepth = Math.min(minDepth, divergeCount);
 		if (diverged) maxDepth = Math.max(maxDepth, divergeCount);
-		outCoords[0] = er2;
-		outCoords[1] = ei2;
+		outCoords[0] = editR-rC;
+		outCoords[1] = editI-iC;
 		return diverged?divergeCount:-1;
 	}
 
 	private static boolean doPixel(int x, int y, int[] pix) {
-		double rotX = (x - width / 2) * Math.cos(c.angle) - (y - height / 2) * Math.sin(c.angle);
-		double rotY = (x - width / 2) * Math.sin(c.angle) + (y - height / 2) * Math.cos(c.angle);
-		double rPart = rotX / (c.zoom) + c.x;
-		double iPart = rotY / (c.zoom) + c.y;// width, zoom is in terms of width. Stretched otherwise.
+		double rotX = (x - width / 2) * Math.cos(Controller.angle) - (y - height / 2) * Math.sin(Controller.angle);
+		double rotY = (x - width / 2) * Math.sin(Controller.angle) + (y - height / 2) * Math.cos(Controller.angle);
+		double rPart = rotX / (Controller.zoom) + Controller.x;
+		double iPart = rotY / (Controller.zoom) + Controller.y;// width, zoom is in terms of width. Stretched otherwise.
 		
 		//this is for last minute changes to pixel coords.
 //	double pointAng = Math.atan2(rPart, iPart);
@@ -167,8 +164,9 @@ public class Generator {
 //	iPart = pointDist * Math.cos(pointAng);
 		
 		double outCoords[] = new double[2];
-		int depth = computeDepth(c.set==0?rPart:c.rC, c.set==0?iPart:c.iC, c.set==1?rPart:c.rZ, c.set==1?iPart:c.iZ, c.set==2?rPart:c.rX, c.set==2?iPart:c.iX, c.searchDepth*iterations, outCoords);
-		pix[x + y * width] = s.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
+		int s = Controller.set;
+		int depth = computeDepth(s==0?rPart:Controller.rC, s==0?iPart:Controller.iC, s==1?rPart:Controller.rZ, s==1?iPart:Controller.iZ, s==2?rPart:Controller.rX, s==2?iPart:Controller.iX, Controller.searchDepth*iterations, outCoords);
+		pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		return depth == -1;
 	}
 
@@ -184,10 +182,13 @@ public class Generator {
 	}
 	
 	public static void setupMagicPalette() {
-		s = new Styler(new File("Harrison.png"));
-		c = new Controller(.25009989470767,0.00000159156228,1.03,10000000000000d);
-		c.searchDepth = 40000;
-		c.va = 0.003;
+		Styler.initPalette(new File("Harrison.png"));
+		Controller.x = .25009989470767;
+		Controller.y = 0.00000159156228;
+		Controller.zoomSpeed = 1.03;
+		Controller.zoom = 10000000000000d;
+		Controller.searchDepth = 40000;
+		Controller.va = 0.003;
 		frames = 61;
 	}
 

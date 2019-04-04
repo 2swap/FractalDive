@@ -10,6 +10,7 @@ import java.awt.image.DataBufferInt;
 
 import com.twoswap.mandelbrot.Controller;
 import com.twoswap.mandelbrot.Generator;
+import com.twoswap.mandelbrot.Styler;
 
 class DimCanvas extends Canvas{
 	
@@ -25,7 +26,7 @@ class DimCanvas extends Canvas{
 		img = new BufferedImage(GUI.dimCanvasWidth,GUI.dimCanvasWidth, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	}
-	public void render() {
+	public void render(double pointR, double pointI) {
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {
 			createBufferStrategy(3);
@@ -33,14 +34,18 @@ class DimCanvas extends Canvas{
 		}
 		for (int x = 0; x < GUI.dimCanvasWidth; x++)
 			for (int y = 0; y < GUI.dimCanvasWidth; y++) {
-				double r = x*4./GUI.dimCanvasWidth-2;
-				double i = y*4./GUI.dimCanvasWidth-2;
+				double r = x*4./GUI.dimCanvasWidth-2+pointR;
+				double i = y*4./GUI.dimCanvasWidth-2+pointI;
 				double[] d = new double[2];
 				int out = 0;
-				Controller c = Generator.c;
-				out = Generator.computeDepth(set==0?r:c.rC, set==0?i:c.iC, set==1?r:c.rZ, set==1?i:c.iZ, set==2?r:c.rX, set==2?i:c.iX, 25, d);
-				pixels[x+y*GUI.dimCanvasWidth] = out == -1?0:0xffffff;
+				String prevType = Styler.type;
+				Styler.type = "rainbow";
+				int depth = Generator.computeDepth(set==0?r:Controller.rC, set==0?i:Controller.iC, set==1?r:Controller.rZ, set==1?i:Controller.iZ, set==2?r:Controller.rX, set==2?i:Controller.iX, 25, d);
+				out = Styler.getColor(depth, 0, 0, 0, d[0],d[1]);
+				Styler.type = prevType;
+				pixels[x+y*GUI.dimCanvasWidth] = out;
 			}
+		for(int dx = 0; dx < 2; dx++) for(int dy = 0; dy < 2; dy++) pixels[GUI.dimCanvasWidth/2+dx+(GUI.dimCanvasWidth/2+dy)*GUI.dimCanvasWidth] = 0xff0000;
 		Graphics g = bs.getDrawGraphics();
 		g.drawImage(img, 0, 0, GUI.dimCanvasWidth, GUI.dimCanvasWidth, null);
 		g.dispose();

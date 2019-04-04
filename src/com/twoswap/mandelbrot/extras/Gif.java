@@ -3,7 +3,6 @@ package com.twoswap.mandelbrot.extras;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Iterator;
 
 import javax.imageio.IIOException;

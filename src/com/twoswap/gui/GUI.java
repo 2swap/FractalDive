@@ -1,11 +1,12 @@
 package com.twoswap.gui;
 
-import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -13,16 +14,20 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Hashtable;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
+import com.twoswap.mandelbrot.Controller;
 import com.twoswap.mandelbrot.Generator;	
 public class GUI{
 	
-	public static int margins = 8, dimCanvasWidth = 64;
+	public static int margins = 8, dimCanvasWidth = 128;
 	private static DimPanel[] dimensions = new DimPanel[3];
 	public static JSlider its;
-	public static JSlider zoomSpeed;
+	public static StyleGUI stylerPanel;
+	public static ControlGUI controllerPanel;
 	
 	static Canvas mainCanvas = new Canvas();
 	private static BufferedImage img;
@@ -44,7 +49,7 @@ public class GUI{
 		
 		//right panel
 		for(int i = 0; i < 3; i++) {
-			dimensions[i] = new DimPanel(800+f.getInsets().left, f.getInsets().top+margins+200*i, 400, 200-margins, i);
+			dimensions[i] = new DimPanel(800+f.getInsets().left, f.getInsets().top+margins+200*i, 400-margins, 200-margins, i);
 			f.add(dimensions[i]);
 		}
 
@@ -54,6 +59,34 @@ public class GUI{
 		leftPanel.setBackground(Color.GRAY);
 		leftPanel.setLayout(null);
 		leftPanel.setBounds(f.getInsets().left+margins, f.getInsets().top+margins, 800-2*margins, 800-2*margins);
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton radioC = new JRadioButton("C");
+		JRadioButton radioZ = new JRadioButton("Z");
+		JRadioButton radioX = new JRadioButton("X");
+		radioC.setBounds(Generator.width+32, margins, 64, 16);
+		radioZ.setBounds(Generator.width+32, margins+16, 64, 16);
+		radioX.setBounds(Generator.width+32, margins+32, 64, 16);
+		radioC.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				Controller.set = 0;
+			}
+		});
+		radioZ.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				Controller.set = 1;
+			}
+		});
+		radioX.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				Controller.set = 2;
+			}
+		});
+		group.add(radioC);
+		group.add(radioZ);
+		group.add(radioX);
+		leftPanel.add(radioC);
+		leftPanel.add(radioZ);
+		leftPanel.add(radioX);
 
 
 		its = new JSlider(0,100,20);
@@ -67,16 +100,6 @@ public class GUI{
 		its.setLabelTable(itsPosition); 
 		leftPanel.add(its);
 
-		zoomSpeed = new JSlider(0,100,50);
-		zoomSpeed.setBounds(margins,Generator.height+margins*3+32,256,32);
-		// Set the labels to be painted on the slider
-		zoomSpeed.setPaintLabels(true);
-		// Add positions label in the slider
-		Hashtable<Integer, JLabel> zoomSpeedPosition = new Hashtable<Integer, JLabel>();
-		for(int i = 0; i <= 100; i+=20) zoomSpeedPosition.put(i, new JLabel(Math.round(Math.pow(1.2,i/50.-1)*100)/100.+""));
-		// Set the label to be drawn
-		zoomSpeed.setLabelTable(zoomSpeedPosition); 
-		leftPanel.add(zoomSpeed);
 		
 		
 		mainCanvas.setBounds(margins,margins,Generator.width,Generator.height);
@@ -84,9 +107,20 @@ public class GUI{
 		
 		f.add(leftPanel);
 		
-		//Button b = new Button("click me");
-		//b.setBounds(530,100,80,30); // setting button position
-		//f.add(b); // adding button into frame
+		
+
+
+		//styler panel
+		stylerPanel = new StyleGUI(800+f.getInsets().left, f.getInsets().top+margins+600, 200-margins, 200-2*margins);
+		f.add(stylerPanel);
+		
+		
+		//controller panel
+		controllerPanel = new ControlGUI(1000+f.getInsets().left, f.getInsets().top+margins+600, 200-margins, 200-2*margins);
+		f.add(controllerPanel);
+		
+		
+		
 		
 		f.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent we){
@@ -98,7 +132,8 @@ public class GUI{
 
 		Generator.iterations = (int) Math.round(Math.exp(Math.sqrt(its.getValue())));
 
-		Generator.c.zoomSpeed = Math.pow(1.2,zoomSpeed.getValue()/50.-1);
+		stylerPanel.tick();
+		controllerPanel.tick();
 		
 		BufferStrategy bs = mainCanvas.getBufferStrategy();
 		if (bs == null) {
