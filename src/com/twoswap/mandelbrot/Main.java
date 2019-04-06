@@ -3,7 +3,6 @@ package com.twoswap.mandelbrot;
 import java.awt.Canvas;
 
 import com.twoswap.gui.GUI;
-import com.twoswap.mandelbrot.extras.Gif;
 
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -43,12 +42,9 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	private void tick() {
-		if (Generator.record && Generator.time-1 == Generator.frames) {
-			Gif.run();
-			running = false;
-			System.out.println("Final x: "+Controller.x+" Final y: "+Controller.y);
-		}
 		GUI.render();
+		if(Generator.record)
+			Generator.savePic(GUI.pixels, "giffer/img"+Generator.time+".png");
 	}
 
 	public static void main(String[] args) {

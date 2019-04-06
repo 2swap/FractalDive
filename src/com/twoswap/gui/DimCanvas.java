@@ -18,6 +18,7 @@ class DimCanvas extends Canvas{
 	private int set = 0;
 	private BufferedImage img;
 	private int[] pixels;
+	private static int crosshair = 5;
 	
 	public DimCanvas(int plane) {
 		this.set = plane;
@@ -40,12 +41,15 @@ class DimCanvas extends Canvas{
 				int out = 0;
 				String prevType = Styler.type;
 				Styler.type = "rainbow";
-				int depth = Generator.computeDepth(set==0?r:Controller.rC, set==0?i:Controller.iC, set==1?r:Controller.rZ, set==1?i:Controller.iZ, set==2?r:Controller.rX, set==2?i:Controller.iX, 25, d);
+				int depth = Generator.computeDepth(set==0?r:Controller.rC, set==0?i:Controller.iC, set==1?r:Controller.rZ, set==1?i:Controller.iZ, set==2?r:Controller.rX, set==2?i:Controller.iX, d);
 				out = Styler.getColor(depth, 0, 0, 0, d[0],d[1]);
 				Styler.type = prevType;
 				pixels[x+y*GUI.dimCanvasWidth] = out;
 			}
-		for(int dx = 0; dx < 2; dx++) for(int dy = 0; dy < 2; dy++) pixels[GUI.dimCanvasWidth/2+dx+(GUI.dimCanvasWidth/2+dy)*GUI.dimCanvasWidth] = 0xff0000;
+		for(int dx = -crosshair; dx <= crosshair; dx++) {
+			pixels[GUI.dimCanvasWidth/2+dx+(GUI.dimCanvasWidth/2)*GUI.dimCanvasWidth] = 0xff0000;
+			pixels[GUI.dimCanvasWidth/2+(GUI.dimCanvasWidth/2+dx)*GUI.dimCanvasWidth] = 0xff0000;
+		}
 		Graphics g = bs.getDrawGraphics();
 		g.drawImage(img, 0, 0, GUI.dimCanvasWidth, GUI.dimCanvasWidth, null);
 		g.dispose();

@@ -14,24 +14,24 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Hashtable;
 
-import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
 import com.twoswap.mandelbrot.Controller;
 import com.twoswap.mandelbrot.Generator;	
 public class GUI{
 	
-	public static int margins = 8, dimCanvasWidth = 128;
+	public static int margins = 4, dimCanvasWidth = 128;
 	private static DimPanel[] dimensions = new DimPanel[3];
 	public static JSlider its;
 	public static StyleGUI stylerPanel;
 	public static ControlGUI controllerPanel;
+	public static GifGUI gifPanel;
 	
 	static Canvas mainCanvas = new Canvas();
 	private static BufferedImage img;
-	private static int[] pixels;
+	public static int[] pixels;
 	
 	public GUI(){
 
@@ -56,34 +56,31 @@ public class GUI{
 
 		//left panel
 		Panel leftPanel = new Panel();
-		leftPanel.setBackground(Color.GRAY);
+		leftPanel.setBackground(Color.lightGray);
 		leftPanel.setLayout(null);
-		leftPanel.setBounds(f.getInsets().left+margins, f.getInsets().top+margins, 800-2*margins, 800-2*margins);
-		ButtonGroup group = new ButtonGroup();
-		JRadioButton radioC = new JRadioButton("C");
-		JRadioButton radioZ = new JRadioButton("Z");
-		JRadioButton radioX = new JRadioButton("X");
+		leftPanel.setBounds(f.getInsets().left+margins, f.getInsets().top+margins, 800-2*margins, 600-margins);
+		JCheckBox radioC = new JCheckBox("C");
+		JCheckBox radioZ = new JCheckBox("Z");
+		JCheckBox radioX = new JCheckBox("X");
 		radioC.setBounds(Generator.width+32, margins, 64, 16);
 		radioZ.setBounds(Generator.width+32, margins+16, 64, 16);
 		radioX.setBounds(Generator.width+32, margins+32, 64, 16);
 		radioC.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				Controller.set = 0;
+				Controller.s1 = radioC.isSelected();
 			}
 		});
 		radioZ.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				Controller.set = 1;
+				Controller.s2 = radioZ.isSelected();
 			}
 		});
 		radioX.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				Controller.set = 2;
+				Controller.s3 = radioX.isSelected();
 			}
 		});
-		group.add(radioC);
-		group.add(radioZ);
-		group.add(radioX);
+		radioC.setSelected(true);
 		leftPanel.add(radioC);
 		leftPanel.add(radioZ);
 		leftPanel.add(radioX);
@@ -111,13 +108,18 @@ public class GUI{
 
 
 		//styler panel
-		stylerPanel = new StyleGUI(800+f.getInsets().left, f.getInsets().top+margins+600, 200-margins, 200-2*margins);
+		stylerPanel = new StyleGUI(800+f.getInsets().left, f.getInsets().top+margins+600, 400-margins, 200-2*margins);
 		f.add(stylerPanel);
 		
 		
 		//controller panel
-		controllerPanel = new ControlGUI(1000+f.getInsets().left, f.getInsets().top+margins+600, 200-margins, 200-2*margins);
+		controllerPanel = new ControlGUI(400+f.getInsets().left, f.getInsets().top+margins+600, 400-margins, 200-2*margins);
 		f.add(controllerPanel);
+		
+		
+		//controller panel
+		gifPanel = new GifGUI(f.getInsets().left + margins, f.getInsets().top+margins+600, 400-2*margins, 200-2*margins);
+		f.add(gifPanel);
 		
 		
 		

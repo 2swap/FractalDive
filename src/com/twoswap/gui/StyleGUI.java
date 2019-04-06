@@ -16,7 +16,7 @@ public class StyleGUI extends Panel{
 	JSlider inhale;
 	
 	public StyleGUI(int x, int y, int w, int h) {
-		setBackground(Color.GRAY);
+		setBackground(Color.lightGray);
 		setLayout(null);
 		setBounds(x,y,w,h);
 		JLabel stylerTag = new JLabel("style");

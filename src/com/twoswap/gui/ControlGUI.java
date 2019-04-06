@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
@@ -15,9 +16,10 @@ import com.twoswap.mandelbrot.Controller;
 public class ControlGUI extends Panel{
 	private static final long serialVersionUID = 1L;
 	JSlider zoomSpeed, moveSpeed;
+	JCheckBox inv;
 	
 	public ControlGUI(int x, int y, int w, int h) {
-		setBackground(Color.GRAY);
+		setBackground(Color.lightGray);
 		setLayout(null);
 		setBounds(x,y,w,h);
 		JLabel tag = new JLabel("control");
@@ -47,8 +49,15 @@ public class ControlGUI extends Panel{
 		moveSpeed.setLabelTable(moveSpeedPosition); 
 		add(moveSpeed);
 		
-		Button b = new Button("randomize");
-		b.setBounds(GUI.margins,100,80,30); // setting button position
+
+		inv = new JCheckBox("Inversion");
+		inv.setBounds(GUI.margins,128+3*GUI.margins,128,16);
+		inv.setIconTextGap(16);
+		add(inv);
+		
+		
+		Button b = new Button("Reset");
+		b.setBounds(GUI.margins,100,64,20); // setting button position
 		b.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				Controller.randomize();
@@ -57,6 +66,7 @@ public class ControlGUI extends Panel{
 		add(b); // adding button into frame
 	}
 	public void tick() {
+		Controller.inversion = inv.isSelected();
 		Controller.zoomSpeed = Math.pow(1.2,zoomSpeed.getValue()/50.-1);
 		Controller.speed = Math.sqrt(moveSpeed.getValue());
 	}

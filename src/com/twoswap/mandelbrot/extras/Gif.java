@@ -40,7 +40,7 @@ public abstract class Gif {
 		gifWriter.prepareWriteSequence(null);
 		for (int i = 0; i < images.length; i++) {
 			BufferedImage img = images[i];
-			if(i%10==0)System.out.println("Saving gif: " + i / (double) Generator.frames * 100 + "%");
+			if(i%10==0)System.out.println("Saving gif: " + i / (double) Generator.time * 100 + "%");
 			IIOImage temp = new IIOImage(img, null, metadata);
 			gifWriter.writeToSequence(temp, null);
 		}
@@ -108,8 +108,8 @@ public abstract class Gif {
 	}
 
 	public static void run() {
-		String[] imgs = new String[Generator.frames];
-		for (int i = 0; i < Generator.frames; i++)
+		String[] imgs = new String[Generator.time];
+		for (int i = 0; i < Generator.time; i++)
 			imgs[i] = "giffer/img" + i + ".png";
 		try {
 			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());

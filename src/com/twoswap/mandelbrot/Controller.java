@@ -5,9 +5,11 @@ public class Controller {
 	
 	public static double x = 0, y = 0, zoom = 50, angle = 0;//coordinates and zoom level
 	public static double speed = 10, zoomSpeed = 1, va = 0;//speed of camera convergence to target, speed of zoom
-	public static int searchDepth = 50, set = 0;
+	public static int searchDepth = 50;
+	public static boolean s1 = true, s2 = false, s3 = false;
 	public static double rC = 0, iC = 0, rZ = 0, iZ = 0, rX = 2, iX = 0;
 	public static double iDrift = 0, rDrift = 0;
+	public static boolean inversion = false;
 	
 	//Known interesting spots
 	//fx = -0.750045367143, fy = -0.004786271734;

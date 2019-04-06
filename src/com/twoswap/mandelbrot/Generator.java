@@ -15,7 +15,6 @@ public class Generator {
 	
 	//Settings for zooms- change away!
 	public static int width = 512, height = 512; //screen size
-	public static int frames = 800;//how long the gif should be
 	public static boolean record = false; //Whether or not to save it as gif
 	
 	//generates one frame.
@@ -107,35 +106,68 @@ public class Generator {
 	}
 
 	//the actual mandelbrot computation
-	public static int computeDepth(double rC, double iC, double rZ, double iZ, double rX, double iX, int its, double[] outCoords) {
+	public static int computeDepth(double rC, double iC, double rZ, double iZ, double rX, double iX, double[] outCoords) {
 		double editI = iZ, editR = rZ, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
 		boolean diverged = false; // whether or not we have exited the radius 2 origin circle yet
 		int divergeCount = 0; // iteration counter
 
 		while (!diverged) {
-			if (ei2+er2 > 4){diverged = true;break;} //out of circle
+			if (ei2+er2 > 16){diverged = true;break;} //out of circle
 			divergeCount++;
 			double newR, newI;
-			if (iX != 0){
-				Complex c = new Complex(editR, editI).pow(new Complex(rX,iX)); //arbitrary complex power
-				newR = c.x;
-				newI = c.y;
-			} else if (rX == 2) {
-				newR = er2 - ei2;
-				newI = editI * editR; //square the complex
-				newI += newI;
-			} else if (rX == -1) {
-				double div = 1 / (er2+ei2);
-				newR = editR*div; //reciprocal it
-				newI = -editI*div;
-			} else if (rX == 3) {
-				newR = editR * er2 - 3 * editR * ei2;
-				newI = (er2 + er2 + er2 - ei2) * editI; //cube it
-			} else {
-				Complex c = new Complex(editR, editI).pow(new Complex(rX,iX)); //arbitrary real power
+			
+			if (iX != 0) { //arbitrary complex power
+				Complex c = new Complex(editR, editI);
+				c = c.pow(new Complex(rX,iX));
 				newR = c.x;
 				newI = c.y;
 			}
+			
+			else if (rX == 2) { //square the complex
+				newR = er2 - ei2;
+				newI = editI * editR;
+				newI += newI;
+			}
+			
+			else if (rX == -1) { //reciprocal it
+				double div = 1 / (er2+ei2);
+				newR = editR*div;
+				newI = -editI*div;
+			}
+			
+			else if (rX == 3) { //cube it
+				newR = editR * er2 - 3 * editR * ei2;
+				newI = (er2 + er2 + er2 - ei2) * editI;
+			}
+			
+			else if (rX == (int)rX && rX >= 0) { //Non-negative integer powers
+				Complex c = new Complex(1,0);
+				Complex z = new Complex(editR,editI);
+				for(int i = 0; i < rX; i++)
+					c = c.multiply(z);
+				newR = c.x;
+				newI = c.y;
+			}
+			
+			else if (rX == (int)rX) { //Negative integer powers
+				double div = 1 / (er2+ei2);
+				editR = editR*div;
+				editI = -editI*div;
+				Complex c = new Complex(1,0);
+				Complex z = new Complex(editR,editI);
+				for(int i = 0; i > rX; i--)
+					c = c.multiply(z);
+				newR = c.x;
+				newI = c.y;
+			}
+			
+			else { //real power
+				Complex c = new Complex(editR, editI);
+				c = c.pow(rX);
+				newR = c.x;
+				newI = c.y;
+			}
+			
 			editI = newI + iC; //add c
 			editR = newR + rC;
 			ei2 = editI * editI; //update squares
@@ -158,14 +190,16 @@ public class Generator {
 		double iPart = rotY / (Controller.zoom) + Controller.y;// width, zoom is in terms of width. Stretched otherwise.
 		
 		//this is for last minute changes to pixel coords.
-//	double pointAng = Math.atan2(rPart, iPart);
-//	double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
-//	rPart = pointDist * Math.sin(pointAng);
-//	iPart = pointDist * Math.cos(pointAng);
+		if(Controller.inversion) {
+			double pointAng = Math.atan2(rPart, iPart);
+			double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
+			rPart = pointDist * Math.sin(pointAng);
+			iPart = pointDist * Math.cos(pointAng);
+		}
 		
 		double outCoords[] = new double[2];
-		int s = Controller.set;
-		int depth = computeDepth(s==0?rPart:Controller.rC, s==0?iPart:Controller.iC, s==1?rPart:Controller.rZ, s==1?iPart:Controller.iZ, s==2?rPart:Controller.rX, s==2?iPart:Controller.iX, Controller.searchDepth*iterations, outCoords);
+		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
+		int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
 		pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		return depth == -1;
 	}
@@ -182,14 +216,14 @@ public class Generator {
 	}
 	
 	public static void setupMagicPalette() {
-		Styler.initPalette(new File("Harrison.png"));
+		Styler.initPalette(new File("2swap.png"));
 		Controller.x = .25009989470767;
 		Controller.y = 0.00000159156228;
 		Controller.zoomSpeed = 1.03;
 		Controller.zoom = 10000000000000d;
 		Controller.searchDepth = 40000;
 		Controller.va = 0.003;
-		frames = 61;
+		//frames = 61;
 	}
 
 	public static BufferedImage getImageFromArray(int[] pixels) {

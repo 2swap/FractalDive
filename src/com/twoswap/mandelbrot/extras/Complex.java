@@ -1,52 +1,5 @@
 package com.twoswap.mandelbrot.extras;
 
-// Complex.java
-
-/*
- * Copyright (c) 2003 Jon S. Squire.  All Rights Reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 
- * -Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- * 
- * -Redistribution in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in
- *  the documentation and/or other materials provided with the distribution.
- * 
- * Neither the name of the author or the names of contributors
- * may be used to endorse or promote products derived from this software
- * without specific prior written permission.
- * 
- * This software is provided "AS IS," without a warranty of any kind. ALL
- * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
- * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
- * OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. THE AUTHOR AND CONTRIBUTORS
- * SHALL NOT BE LIABLE FOR ANY DAMAGES OR LIABILITIES SUFFERED BY LICENSEE
- * AS A RESULT OF OR RELATING TO USE, MODIFICATION OR DISTRIBUTION OF THE
- * SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL THE AUTHOR OR CONTRIBUTORS
- * OR SUCCEEDING LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA,
- * OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE
- * DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY,
- * ARISING OUT OF THE USE OF OR INABILITY TO USE SOFTWARE, EVEN IF THE AUTHOR
- * OR CONTRIBUTORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- * 
- * You acknowledge that this software is not designed, licensed or
- * intended for use in the design, construction, operation or
- * maintenance of any human use medical device.
- */
-
-/**
- * Immutable, complex numbers. A Complex consists of a real and imaginary part, called Cartesian coordinates.
- *
- * The Complex class provides methods for arithmetic such as: add, subtract, multiply, divide, negate and invert. Also provided are complex functions sin, cos, tan, asin, acos, atan, sqrt, log, exp, pow, sinh, cosh, tanh, atanh.
- *
- * Source code <a href="Complex.java">Complex.java</a>
- */
-import net.jafama.*;
-
 public strictfp class Complex extends Object {
 	public double x, y; // Cartesian representation of complex
 
@@ -76,14 +29,14 @@ public strictfp class Complex extends Object {
 
 	/** convert cartesian to polar */
 	public Complex polar() {
-		double r = FastMath.sqrt(this.x * this.x + this.y * this.y);
-		double a = FastMath.atan2(this.y, this.x);
+		double r = Math.sqrt(this.x * this.x + this.y * this.y);
+		double a = Math.atan2(this.y, this.x);
 		return new Complex(r, a);
 	}
 
 	/** convert polar to cartesian */
 	public Complex cartesian() {
-		return new Complex(this.x * FastMath.cos(this.y), this.x * FastMath.sin(this.y));
+		return new Complex(this.x * Math.cos(this.y), this.x * Math.sin(this.y));
 	}
 
 	/** extract the real part of the complex number */
@@ -98,12 +51,12 @@ public strictfp class Complex extends Object {
 
 	/** extract the magnitude of the complex number */
 	public double magnitude() {
-		return FastMath.sqrt(this.x * this.x + this.y * this.y);
+		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 
 	/** extract the argument of the complex number */
 	public double argument() {
-		return FastMath.atan2(this.y, this.x);
+		return Math.atan2(this.y, this.x);
 	}
 
 	/** add complex numbers */
@@ -165,7 +118,7 @@ public strictfp class Complex extends Object {
 
 	/** compute the absolute value of a complex number */
 	public double abs() {
-		return FastMath.sqrt(this.x * this.x + this.y * this.y);
+		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 
 	/** compare complex numbers for equality */
@@ -197,24 +150,24 @@ public strictfp class Complex extends Object {
 
 	/** compute e to the power of the complex number */
 	public Complex exp() {
-		double exp_x = FastMath.exp(this.x);
-		return new Complex(exp_x * FastMath.cos(this.y), exp_x * FastMath.sin(this.y));
+		double exp_x = Math.exp(this.x);
+		return new Complex(exp_x * Math.cos(this.y), exp_x * Math.sin(this.y));
 	}
 
 	/** compute the natural logarithm of the complex number */
 	public Complex log() {
-		double rpart = FastMath.sqrt(this.x * this.x + this.y * this.y);
-		double ipart = FastMath.atan2(this.y, this.x);
-		if (ipart > FastMath.PI)
-			ipart = ipart - 2.0 * FastMath.PI;
-		return new Complex(FastMath.log(rpart), ipart);
+		double rpart = Math.sqrt(this.x * this.x + this.y * this.y);
+		double ipart = Math.atan2(this.y, this.x);
+		if (ipart > Math.PI)
+			ipart = ipart - 2.0 * Math.PI;
+		return new Complex(Math.log(rpart), ipart);
 	}
 
 	/** compute the square root of the complex number */
 	public Complex sqrt() {
-		double r = FastMath.sqrt(this.x * this.x + this.y * this.y);
-		double rpart = FastMath.sqrt(0.5 * (r + this.x));
-		double ipart = FastMath.sqrt(0.5 * (r - this.x));
+		double r = Math.sqrt(this.x * this.x + this.y * this.y);
+		double rpart = Math.sqrt(0.5 * (r + this.x));
+		double ipart = Math.sqrt(0.5 * (r - this.x));
 		if (this.y < 0.0)
 			ipart = -ipart;
 		return new Complex(rpart, ipart);
@@ -234,12 +187,12 @@ public strictfp class Complex extends Object {
 
 	/** compute the sin of the complex number */
 	public Complex sin() {
-		return new Complex(FastMath.sin(this.x) * cosh(this.y), FastMath.cos(this.x) * sinh(this.y));
+		return new Complex(Math.sin(this.x) * cosh(this.y), Math.cos(this.x) * sinh(this.y));
 	}
 
 	/** compute the cosine of the complex number */
 	public Complex cos() {
-		return new Complex(FastMath.cos(this.x) * cosh(this.y), -FastMath.sin(this.x) * sinh(this.y));
+		return new Complex(Math.cos(this.x) * cosh(this.y), -Math.sin(this.x) * sinh(this.y));
 	}
 
 	/** compute the tangent of the complex number */
@@ -272,12 +225,12 @@ public strictfp class Complex extends Object {
 
 	/** compute the hyperbolic sin of the complex number */
 	public Complex sinh() {
-		return new Complex(sinh(this.x) * FastMath.cos(this.y), cosh(this.x) * FastMath.sin(this.y));
+		return new Complex(sinh(this.x) * Math.cos(this.y), cosh(this.x) * Math.sin(this.y));
 	}
 
 	/** compute the hyperbolic cosine of the complex number */
 	public Complex cosh() {
-		return new Complex(cosh(this.x) * FastMath.cos(this.y), sinh(this.x) * FastMath.sin(this.y));
+		return new Complex(cosh(this.x) * Math.cos(this.y), sinh(this.x) * Math.sin(this.y));
 	}
 
 	/** compute the hyperbolic tangent of the complex number */
@@ -292,10 +245,10 @@ public strictfp class Complex extends Object {
 
 	// local - should be a good implementation in FastMath
 	private double sinh(double x) {
-		return (FastMath.exp(x) - FastMath.exp(-x)) / 2.0;
+		return (Math.exp(x) - Math.exp(-x)) / 2.0;
 	}
 
 	private double cosh(double x) {
-		return (FastMath.exp(x) + FastMath.exp(-x)) / 2.0;
+		return (Math.exp(x) + Math.exp(-x)) / 2.0;
 	}
 }
