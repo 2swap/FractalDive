@@ -81,6 +81,7 @@ public class GUI{
 			}
 		});
 		radioC.setSelected(true);
+		radioZ.setSelected(true);
 		leftPanel.add(radioC);
 		leftPanel.add(radioZ);
 		leftPanel.add(radioX);

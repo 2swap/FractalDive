@@ -16,7 +16,7 @@ import com.twoswap.mandelbrot.Controller;
 public class ControlGUI extends Panel{
 	private static final long serialVersionUID = 1L;
 	JSlider zoomSpeed, moveSpeed;
-	JCheckBox inv;
+	JCheckBox inv, burningShip;
 	
 	public ControlGUI(int x, int y, int w, int h) {
 		setBackground(Color.lightGray);
@@ -48,12 +48,17 @@ public class ControlGUI extends Panel{
 		// Set the label to be drawn
 		moveSpeed.setLabelTable(moveSpeedPosition); 
 		add(moveSpeed);
-		
+
 
 		inv = new JCheckBox("Inversion");
-		inv.setBounds(GUI.margins,128+3*GUI.margins,128,16);
+		inv.setBounds(GUI.margins,108+3*GUI.margins,128,16);
 		inv.setIconTextGap(16);
 		add(inv);
+
+		burningShip = new JCheckBox("Burning Ship");
+		burningShip.setBounds(GUI.margins,128+3*GUI.margins,128,16);
+		burningShip.setIconTextGap(16);
+		add(burningShip);
 		
 		
 		Button b = new Button("Reset");
@@ -67,6 +72,7 @@ public class ControlGUI extends Panel{
 	}
 	public void tick() {
 		Controller.inversion = inv.isSelected();
+		Controller.burningShip = burningShip.isSelected();
 		Controller.zoomSpeed = Math.pow(1.2,zoomSpeed.getValue()/50.-1);
 		Controller.speed = Math.sqrt(moveSpeed.getValue());
 	}

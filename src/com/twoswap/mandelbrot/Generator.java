@@ -170,6 +170,10 @@ public class Generator {
 			
 			editI = newI + iC; //add c
 			editR = newR + rC;
+			if(Controller.burningShip) {
+				editI = Math.abs(editI);
+				editR = Math.abs(editR);
+			}
 			ei2 = editI * editI; //update squares
 			er2 = editR * editR;
 			if (divergeCount > iterations) break;
