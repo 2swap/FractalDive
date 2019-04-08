@@ -112,7 +112,7 @@ public class Generator {
 		int divergeCount = 0; // iteration counter
 
 		while (!diverged) {
-			if (ei2+er2 > 16){diverged = true;break;} //out of circle
+			if (ei2+er2 > 4){diverged = true;break;} //out of circle
 			divergeCount++;
 			double newR, newI;
 			
