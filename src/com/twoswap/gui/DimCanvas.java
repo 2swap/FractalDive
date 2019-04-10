@@ -35,8 +35,8 @@ class DimCanvas extends Canvas{
 		}
 		for (int x = 0; x < GUI.dimCanvasWidth; x++)
 			for (int y = 0; y < GUI.dimCanvasWidth; y++) {
-				double r = x*4./GUI.dimCanvasWidth-2+pointR;
-				double i = y*4./GUI.dimCanvasWidth-2+pointI;
+				double r = x*2./GUI.dimCanvasWidth-1+pointR;
+				double i = y*2./GUI.dimCanvasWidth-1+pointI;
 				double[] d = new double[2];
 				int out = 0;
 				String prevType = Styler.type;

@@ -9,6 +9,8 @@ import javax.imageio.ImageIO;
 import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
 
+import net.jafama.FastMath;
+
 public class Generator {
 
 	//dont touch stuff in this block
@@ -200,10 +202,10 @@ public class Generator {
 		
 		//this is for last minute changes to pixel coords.
 		if(Controller.inversion) {
-			double pointAng = Math.atan2(rPart, iPart);
-			double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
-			rPart = pointDist * Math.sin(pointAng);
-			iPart = pointDist * Math.cos(pointAng);
+			double pointAng = FastMath.atan2(rPart, iPart);
+			double pointDist = 1/FastMath.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
+			rPart = pointDist * FastMath.sin(pointAng);
+			iPart = pointDist * FastMath.cos(pointAng);
 		}
 		
 		double outCoords[] = new double[2];
