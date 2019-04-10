@@ -17,6 +17,7 @@ import java.util.Hashtable;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 
 import com.twoswap.mandelbrot.Controller;
 import com.twoswap.mandelbrot.Generator;	
@@ -28,6 +29,8 @@ public class GUI{
 	public static StyleGUI stylerPanel;
 	public static ControlGUI controllerPanel;
 	public static GifGUI gifPanel;
+	public static JTextArea consoleArea;
+	public static String lastStr = "";
 	
 	static Canvas mainCanvas = new Canvas();
 	private static BufferedImage img;
@@ -62,9 +65,9 @@ public class GUI{
 		JCheckBox radioC = new JCheckBox("C");
 		JCheckBox radioZ = new JCheckBox("Z");
 		JCheckBox radioX = new JCheckBox("X");
-		radioC.setBounds(Generator.width+32, margins, 64, 16);
-		radioZ.setBounds(Generator.width+32, margins+16, 64, 16);
-		radioX.setBounds(Generator.width+32, margins+32, 64, 16);
+		radioC.setBounds(Generator.width+margins*2+0*(margins+64), margins, 64, 16);
+		radioZ.setBounds(Generator.width+margins*2+1*(margins+64), margins, 64, 16);
+		radioX.setBounds(Generator.width+margins*2+2*(margins+64), margins, 64, 16);
 		radioC.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				Controller.s1 = radioC.isSelected();
@@ -85,10 +88,18 @@ public class GUI{
 		leftPanel.add(radioC);
 		leftPanel.add(radioZ);
 		leftPanel.add(radioX);
+		
+		
+		//Console
+		consoleArea = new JTextArea();
+		consoleArea.setBounds(margins,margins*2+Generator.height, Generator.width, 600-Generator.height-4*margins);
+		consoleArea.setEditable(false);
+		clog("Console Loaded");
+		leftPanel.add(consoleArea);
 
 
 		its = new JSlider(0,100,20);
-		its.setBounds(margins,Generator.height+margins*2,256,32);
+		its.setBounds(2*margins+Generator.height,margins*2+16,256,32);
 		// Set the labels to be painted on the slider
 		its.setPaintLabels(true);
 		// Add positions label in the slider
@@ -131,6 +142,13 @@ public class GUI{
 			}
 		});
 	}
+	
+	public static void clog(String str) {
+		if(str.equals(lastStr)) return;
+		lastStr = str;
+		consoleArea.append(str+"\n");
+	}
+	
 	public static void render() {
 
 		Generator.iterations = (int) Math.round(Math.exp(Math.sqrt(its.getValue())));

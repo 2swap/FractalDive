@@ -2,6 +2,7 @@ package com.twoswap.gui;
 
 import java.awt.Color;
 import java.awt.Panel;
+import java.awt.TextField;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -33,21 +34,30 @@ class DimPanel extends Panel {
 		add(c);
 		
 		check = new JCheckBox("show " + names[p], shouldRender);
-		check.setBounds(2*GUI.margins+GUI.dimCanvasWidth,2*GUI.margins+GUI.dimCanvasWidth,96,16);
+		check.setBounds(GUI.margins,20+3*GUI.margins+GUI.dimCanvasWidth,128,16);
 		check.setIconTextGap(16);
 		add(check);
-		
 		point = new JLabel("Location");
-		point.setBounds(2*GUI.margins+GUI.dimCanvasWidth,20+GUI.dimCanvasWidth,128,32);
+		point.setBounds(GUI.margins,20+16+3*GUI.margins+GUI.dimCanvasWidth,128,16);
 		add(point);
 		
-		rPart = new JSlider(-80,80,0);
-		rPart.setBounds(GUI.margins,GUI.margins*2+GUI.dimCanvasWidth,GUI.dimCanvasWidth,32);
-		add(rPart);
 		
+		
+		rPart = new JSlider(-80,80,0);
+		rPart.setBounds(GUI.margins,GUI.margins*2+GUI.dimCanvasWidth,GUI.dimCanvasWidth,20);
+		add(rPart);
 		iPart = new JSlider(JSlider.VERTICAL,-80,80,0);
-		iPart.setBounds(GUI.margins*2+GUI.dimCanvasWidth,GUI.margins,32,GUI.dimCanvasWidth);
+		iPart.setBounds(GUI.margins*2+GUI.dimCanvasWidth,GUI.margins,20,GUI.dimCanvasWidth);
 		add(iPart);
+		
+		
+		
+		TextField eqn = new TextField();
+		eqn.setBounds(20+GUI.dimCanvasWidth+GUI.margins*3,GUI.margins,w-4*GUI.margins-GUI.dimCanvasWidth-20,20);
+		eqn.setText("Parametric example: '<5*t,4sin(t)>'");
+		add(eqn);
+		
+		
 		
 		if(p == 2) rPart.setValue(-40);//exponent 2 by default
 	}

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
 
 public class Generator {
@@ -19,6 +20,10 @@ public class Generator {
 	
 	//generates one frame.
 	public static int[] generate() {
+		
+		//A quirk of the mandelbrot set, NOT a bug. Result of negative or imaginary exponents when piping pixel values into C but not Z (and not X)
+		if(Controller.s1 && !Controller.s2 && !Controller.s3 && (Controller.rX < 0 || Controller.iX != 0)) GUI.clog("Unexpected black screen? You probably mean to check the Z button.");
+		
 		minDepth = 10000000;
 		maxDepth = 0; //keep track of our min and max depths reached
 		
