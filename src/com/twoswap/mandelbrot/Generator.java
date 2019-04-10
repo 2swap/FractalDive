@@ -3,11 +3,69 @@ package com.twoswap.mandelbrot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
 import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
+
+
+class Computation{
+	public Computation(int x, int y) {
+		this.x = x;
+		this.y =y;
+	}
+	
+	int x,y;
+
+}
+
+class PixelComputationQueue {
+	public static LinkedBlockingDeque<Computation> queue;
+	private int threadcount;
+	public static boolean run;
+	public PixelComputationQueue(int threadcount) {
+		this.threadcount = threadcount;
+		this.queue = new LinkedBlockingDeque<Computation>();
+		run = false;
+		for(int i = 0; i < threadcount; i++) {
+			Thread thread = new Thread(){
+				public void run(){
+					while(true) {
+						try {
+							Computation c = PixelComputationQueue.queue.take();
+							Generator.doPixel(c.y, c.y, Generator.pix);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}
+			};
+			thread.start();
+		}
+	}
+
+	public void addToQueue(int x, int y) {
+		queue.add(new Computation(x,y));
+	}
+
+	public void compute() {
+		run = true;
+		while(!queue.isEmpty()) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		run = false;
+	}
+}
 
 public class Generator {
 
@@ -18,6 +76,10 @@ public class Generator {
 	public static int width = 512, height = 512; //screen size
 	public static boolean record = false; //Whether or not to save it as gif
 	
+	//initialize frame
+	static int[] pix = new int[width * height];
+	static PixelComputationQueue queue = new PixelComputationQueue(6);
+
 	//generates one frame.
 	public static int[] generate() {
 		
@@ -27,32 +89,28 @@ public class Generator {
 		minDepth = 10000000;
 		maxDepth = 0; //keep track of our min and max depths reached
 		
-		//initialize frame
-		int[] pix = new int[width * height];
-		
 		//fill it with -1
-		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++)
-				pix[x+y*width] = -1;
+		Arrays.fill(pix, -1);
+		
 		
 		//brute force compute all points (x,y) for which x and y both even
 		for (int x = 0; x < width; x+=2) for (int y = 0; y < height; y+=2)
-				doPixel(x, y, pix);
-		
+			queue.addToQueue(x, y);
+		queue.compute();
 		//fill in points that can be determined by neighbors
 		optimizeFill(pix);
-		
+			
 		//same as the last loop, but for x,y odd
 		for (int x = 1; x < width; x+=2) for (int y = 1; y < height; y+=2)
-			if(pix[x+y*width] == -1) doPixel(x, y, pix);
-		
+			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
+		queue.compute();
 		//repeat neighbor fill
 		optimizeFill(pix);
 		
 		//solve all remaining unknown points
 		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
-			if(pix[x+y*width] == -1) doPixel(x, y, pix);
-		
+			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
+		queue.compute();
 		
 		
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
@@ -111,6 +169,7 @@ public class Generator {
 	}
 
 	//the actual mandelbrot computation
+	//TODO: Parallelize
 	public static int computeDepth(double rC, double iC, double rZ, double iZ, double rX, double iX, double[] outCoords) {
 		double editI = iZ, editR = rZ, ei2 = editI * editI, er2 = editR * editR; //some intermediate temp values
 		boolean diverged = false; // whether or not we have exited the radius 2 origin circle yet
@@ -192,7 +251,7 @@ public class Generator {
 		return diverged?divergeCount:-1;
 	}
 
-	private static boolean doPixel(int x, int y, int[] pix) {
+	static boolean doPixel(int x, int y, int[] pix) {
 		double rotX = (x - width / 2) * Math.cos(Controller.angle) - (y - height / 2) * Math.sin(Controller.angle);
 		double rotY = (x - width / 2) * Math.sin(Controller.angle) + (y - height / 2) * Math.cos(Controller.angle);
 		double rPart = rotX / (Controller.zoom) + Controller.x;
