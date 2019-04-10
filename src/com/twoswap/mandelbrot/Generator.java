@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 
 import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
-
+import net.jafama.FastMath;
 
 class Computation{
 	public Computation(int x, int y) {
@@ -116,7 +116,7 @@ public class Generator {
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
 		lastMinDepth = minDepth;//update these for controller
 		lastMaxDepth = maxDepth;
-		if(Math.random() < .001) {
+		if(FastMath.random() < .001) {
 			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			savePic(pix, "images/"+System.currentTimeMillis()+".png");//save pictures now and then
 		}
@@ -235,8 +235,8 @@ public class Generator {
 			editI = newI + iC; //add c
 			editR = newR + rC;
 			if(Controller.burningShip) {
-				editI = Math.abs(editI);
-				editR = Math.abs(editR);
+				editI = FastMath.abs(editI);
+				editR = FastMath.abs(editR);
 			}
 			ei2 = editI * editI; //update squares
 			er2 = editR * editR;
@@ -244,25 +244,25 @@ public class Generator {
 		}
 		if(!diverged) divergeCount = 0;
 		//if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth++;
-		if (diverged) minDepth = Math.min(minDepth, divergeCount);
-		if (diverged) maxDepth = Math.max(maxDepth, divergeCount);
+		if (diverged) minDepth = FastMath.min(minDepth, divergeCount);
+		if (diverged) maxDepth = FastMath.max(maxDepth, divergeCount);
 		outCoords[0] = editR-rC;
 		outCoords[1] = editI-iC;
 		return diverged?divergeCount:-1;
 	}
 
 	static boolean doPixel(int x, int y, int[] pix) {
-		double rotX = (x - width / 2) * Math.cos(Controller.angle) - (y - height / 2) * Math.sin(Controller.angle);
-		double rotY = (x - width / 2) * Math.sin(Controller.angle) + (y - height / 2) * Math.cos(Controller.angle);
+		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
+		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);
 		double rPart = rotX / (Controller.zoom) + Controller.x;
 		double iPart = rotY / (Controller.zoom) + Controller.y;// width, zoom is in terms of width. Stretched otherwise.
 		
 		//this is for last minute changes to pixel coords.
 		if(Controller.inversion) {
-			double pointAng = Math.atan2(rPart, iPart);
-			double pointDist = 1/Math.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
-			rPart = pointDist * Math.sin(pointAng);
-			iPart = pointDist * Math.cos(pointAng);
+			double pointAng = FastMath.atan2(rPart, iPart);
+			double pointDist = 1/FastMath.sqrt(rPart*rPart+iPart*iPart);//try changing this to 1/sqrt!
+			rPart = pointDist * FastMath.sin(pointAng);
+			iPart = pointDist * FastMath.cos(pointAng);
 		}
 		
 		double outCoords[] = new double[2];
