@@ -78,7 +78,7 @@ public class Generator {
 	
 	//initialize frame
 	static int[] pix = new int[width * height];
-	static PixelComputationQueue queue = new PixelComputationQueue(6);
+	static PixelComputationQueue queue = new PixelComputationQueue(4);
 
 	//generates one frame.
 	public static int[] generate() {
@@ -109,8 +109,8 @@ public class Generator {
 		
 		//solve all remaining unknown points
 		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
-			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
-		queue.compute();
+			if(pix[x+y*width] == -1) doPixel(x, y, pix);
+		// queue.compute(); TODO: Figure out why I cannot run this in parrael
 		
 		
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
