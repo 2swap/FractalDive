@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.twoswap.mandelbrot.extras.Complex;
+
 import net.jafama.FastMath;
 
 public class Styler {
@@ -56,16 +58,7 @@ public class Styler {
 				b = (int) (bo*scaler);
 			}
 			if (type.equals("sinhsv")) {
-				double theta = Math.atan2(iZ, rZ)*2;
-				double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
-				double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
-				double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
-
-				double d = Math.sqrt(rZ*rZ+iZ*iZ) - 2;
-				double scaler = Math.sin((d-.5)*Math.PI)/2+.5;
-				r = (int) (ro*scaler);
-				g = (int) (go*scaler);
-				b = (int) (bo*scaler);
+				return sinHSV(rZ,iZ);
 			}
 			if (type.equals("image")) {
 				//TODO:Repeats an image, warped by the set
@@ -168,5 +161,20 @@ public class Styler {
 		type = styles[(int)(Math.random()*styles.length)];// + (Math.random()<.5?"dark":"");
 		inhale = (Math.random()*.8-.4);
 		System.out.println("Style: " + type);
+	}
+
+	public static int rect2(Complex c) {
+		return (int)((c.x/4+.5)*256) * 0x10000 + (int)((c.y/4+.5)*256) * 0x100;
+	}
+	
+	public static int sinHSV(double rZ, double iZ) {
+		double theta = Math.atan2(iZ, rZ)*2;
+		double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
+		double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
+		double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
+
+		double d = Math.sqrt(rZ*rZ+iZ*iZ) - 2;
+		double scaler = Math.sin((d-.5)*Math.PI)/2+.5;
+		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
 	}
 }

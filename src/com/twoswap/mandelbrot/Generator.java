@@ -4,14 +4,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
 import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
+
 import net.jafama.FastMath;
 
 class Computation{
@@ -38,7 +37,7 @@ class PixelComputationQueue {
 					while(true) {
 						try {
 							Computation c = PixelComputationQueue.queue.take();
-							Generator.doPixel(c.y, c.y, Generator.pix);
+							Generator.doPixel(c.x, c.y, Generator.pix);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -75,6 +74,7 @@ public class Generator {
 	//Settings for zooms- change away!
 	public static int width = 512, height = 512; //screen size
 	public static boolean record = false; //Whether or not to save it as gif
+	public static double imageRate = .0001;
 	
 	//initialize frame
 	static int[] pix = new int[width * height];
@@ -116,7 +116,7 @@ public class Generator {
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
 		lastMinDepth = minDepth;//update these for controller
 		lastMaxDepth = maxDepth;
-		if(FastMath.random() < .001) {
+		if(FastMath.random() < imageRate) {
 			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			savePic(pix, "images/"+System.currentTimeMillis()+".png");//save pictures now and then
 		}
@@ -168,6 +168,22 @@ public class Generator {
 		}
 	}
 
+	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX) {
+		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
+		for(int i = 0; i < GUI.its.getValue()-GUI.its.getMinimum(); i++) {
+			c = c.multiply(c).add(new Complex(rC,iC));
+		}
+		return c;
+	}
+	
+	public static Complex distIteration(double rC, double iC, double rZ, double iZ, double rX, double iX) {
+		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
+		for(int i = 0; i < GUI.its.getValue()-GUI.its.getMinimum(); i++) {
+			c = c.multiply(c).add(new Complex(rC,iC));
+		}
+		return c.subtract(new Complex(rZ,iZ));
+	}
+	
 	//the actual mandelbrot computation
 	//TODO: Parallelize
 	public static int computeDepth(double rC, double iC, double rZ, double iZ, double rX, double iX, double[] outCoords) {
@@ -252,6 +268,7 @@ public class Generator {
 	}
 
 	static boolean doPixel(int x, int y, int[] pix) {
+		
 		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
 		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);
 		double rPart = rotX / (Controller.zoom) + Controller.x;
@@ -264,12 +281,20 @@ public class Generator {
 			rPart = pointDist * FastMath.sin(pointAng);
 			iPart = pointDist * FastMath.cos(pointAng);
 		}
-		
-		double outCoords[] = new double[2];
+
 		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
-		int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
-		pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
-		return depth == -1;
+		
+		
+		if(true) {
+			double outCoords[] = new double[2];
+			int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
+			pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
+			return depth == -1;
+		}// else {
+		//	Complex c = distIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX);
+		//	pix[x+y*width] = Styler.sinHSV(c.x,c.y);
+		//	return false;
+		}
 	}
 
 	//saves pix as an image
