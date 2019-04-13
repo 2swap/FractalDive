@@ -285,16 +285,16 @@ public class Generator {
 		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
 		
 		
-		if(true) {
+		//if(true) {
 			double outCoords[] = new double[2];
 			int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
 			pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 			return depth == -1;
-		}// else {
+		//}// else {
 		//	Complex c = distIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX);
 		//	pix[x+y*width] = Styler.sinHSV(c.x,c.y);
 		//	return false;
-		}
+		//}
 	}
 
 	//saves pix as an image
