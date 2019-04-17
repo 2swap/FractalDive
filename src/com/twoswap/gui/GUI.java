@@ -31,6 +31,7 @@ public class GUI{
 	public static GifGUI gifPanel;
 	public static JTextArea consoleArea;
 	public static String lastStr = "";
+	public static JLabel itsLabel;
 	
 	static Canvas mainCanvas = new Canvas();
 	private static BufferedImage img;
@@ -104,10 +105,14 @@ public class GUI{
 		its.setPaintLabels(true);
 		// Add positions label in the slider
 		Hashtable<Integer, JLabel> itsPosition = new Hashtable<Integer, JLabel>();
-		for(int i = 0; i <= 100; i+=20) itsPosition.put(i, new JLabel(Math.round(Math.exp(Math.sqrt(i)))+""));
+		for(int i = 0; i <= 100; i+=20) itsPosition.put(i, new JLabel(itsBarToNumber(i)+""));
 		// Set the label to be drawn
 		its.setLabelTable(itsPosition); 
 		leftPanel.add(its);
+		
+		itsLabel = new JLabel();
+		itsLabel.setBounds(2*margins+Generator.height,margins*2+64,256,32);
+		leftPanel.add(itsLabel);
 
 		
 		
@@ -151,7 +156,8 @@ public class GUI{
 	
 	public static void render() {
 
-		Generator.iterations = (int) Math.round(Math.exp(Math.sqrt(its.getValue())));
+		Generator.iterations = itsBarToNumber(its.getValue());
+		itsLabel.setText(""+Generator.iterations);
 
 		stylerPanel.tick();
 		controllerPanel.tick();
@@ -172,5 +178,9 @@ public class GUI{
 		g.dispose();
 		bs.show();
 		for(DimPanel d : dimensions) d.render();
+	}
+	
+	public static int itsBarToNumber(int x) {
+		return (int) (x + Math.exp(Math.sqrt(x)-3));
 	}
 }

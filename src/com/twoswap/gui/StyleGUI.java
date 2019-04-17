@@ -5,7 +5,9 @@ import java.awt.Panel;
 import java.awt.TextField;
 import java.util.Hashtable;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
 import com.twoswap.mandelbrot.Styler;
@@ -14,6 +16,7 @@ public class StyleGUI extends Panel{
 	private static final long serialVersionUID = 1L;
 	TextField tf;
 	JSlider inhale;
+	JRadioButton r1,r2;
 	
 	public StyleGUI(int x, int y, int w, int h) {
 		setBackground(Color.lightGray);
@@ -25,7 +28,7 @@ public class StyleGUI extends Panel{
 		add(stylerTag);
 		
 		inhale = new JSlider(0,100,50);
-		inhale.setBounds(GUI.margins,20,200-3*GUI.margins,32);
+		inhale.setBounds(GUI.margins,16+GUI.margins,128,32);
 		// Set the labels to be painted on the slider
 		inhale.setPaintLabels(true);
 		// Add positions label in the slider
@@ -36,10 +39,20 @@ public class StyleGUI extends Panel{
 		add(inhale);
 		
 		tf = new TextField("rainbow");
-		tf.setBounds(GUI.margins,60,200-3*GUI.margins,32);
+		tf.setBounds(GUI.margins,16+32+2*GUI.margins,128,16);
 		add(tf);
+		
+		r1 = new JRadioButton("Iteration Count");
+		r2 = new JRadioButton("Result of iterations");
+		r1.setBounds(128+2*GUI.margins,GUI.margins+16,196,16);
+		r2.setBounds(128+2*GUI.margins,GUI.margins+32,196,16);
+		r1.setSelected(true);
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(r1);bg.add(r2);
+		add(r1);add(r2);
 	}
 	public void tick() {
+		Styler.iterationCount = r1.isSelected();
 		Styler.type = tf.getText();
 		Styler.inhale = inhale.getValue()/50.-1;
 	}

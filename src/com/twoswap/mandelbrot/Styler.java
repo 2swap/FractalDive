@@ -14,6 +14,7 @@ public class Styler {
 
 	public static double inhale = 0;//how fast the colors should go in(-) or out(+)
 	public static String type = "rainbow";//the way it looks
+	public static boolean iterationCount = true;
 
 	//for image palettes
 	public static int cycleWidth = 1, cycleHeight = 1;
@@ -173,7 +174,7 @@ public class Styler {
 		double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
 		double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
 
-		double d = Math.sqrt(rZ*rZ+iZ*iZ) - 2;
+		double d = Math.sqrt(rZ*rZ+iZ*iZ);
 		double scaler = Math.sin((d-.5)*Math.PI)/2+.5;
 		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
 	}

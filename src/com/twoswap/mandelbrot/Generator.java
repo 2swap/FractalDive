@@ -4,67 +4,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 
 import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.extras.Complex;
+import com.twoswap.mandelbrot.parallelization.PixelComputationQueue;
 
 import net.jafama.FastMath;
-
-class Computation{
-	public Computation(int x, int y) {
-		this.x = x;
-		this.y =y;
-	}
-	
-	int x,y;
-
-}
-
-class PixelComputationQueue {
-	public static LinkedBlockingDeque<Computation> queue;
-	private int threadcount;
-	public static boolean run;
-	public PixelComputationQueue(int threadcount) {
-		this.threadcount = threadcount;
-		this.queue = new LinkedBlockingDeque<Computation>();
-		run = false;
-		for(int i = 0; i < threadcount; i++) {
-			Thread thread = new Thread(){
-				public void run(){
-					while(true) {
-						try {
-							Computation c = PixelComputationQueue.queue.take();
-							Generator.doPixel(c.x, c.y, Generator.pix);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					
-				}
-			};
-			thread.start();
-		}
-	}
-
-	public void addToQueue(int x, int y) {
-		queue.add(new Computation(x,y));
-	}
-
-	public void compute() {
-		run = true;
-		while(!queue.isEmpty()) {
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		run = false;
-	}
-}
 
 public class Generator {
 
@@ -77,7 +24,7 @@ public class Generator {
 	public static double imageRate = .0001;
 	
 	//initialize frame
-	static int[] pix = new int[width * height];
+	public static int[] pix = new int[width * height];
 	static PixelComputationQueue queue = new PixelComputationQueue(4);
 
 	//generates one frame.
@@ -168,20 +115,10 @@ public class Generator {
 		}
 	}
 
-	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX) {
+	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX, int d) {
 		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
-		for(int i = 0; i < GUI.its.getValue()-GUI.its.getMinimum(); i++) {
-			c = c.multiply(c).add(new Complex(rC,iC));
-		}
+		for(int i = 0; i < d; i++) c = c.multiply(c).add(new Complex(rC,iC));
 		return c;
-	}
-	
-	public static Complex distIteration(double rC, double iC, double rZ, double iZ, double rX, double iX) {
-		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
-		for(int i = 0; i < GUI.its.getValue()-GUI.its.getMinimum(); i++) {
-			c = c.multiply(c).add(new Complex(rC,iC));
-		}
-		return c.subtract(new Complex(rZ,iZ));
 	}
 	
 	//the actual mandelbrot computation
@@ -267,7 +204,7 @@ public class Generator {
 		return diverged?divergeCount:-1;
 	}
 
-	static boolean doPixel(int x, int y, int[] pix) {
+	public static boolean doPixel(int x, int y, int[] pix) {
 		
 		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
 		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);
@@ -285,16 +222,16 @@ public class Generator {
 		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
 		
 		
-		//if(true) {
+		if(Styler.iterationCount) {
 			double outCoords[] = new double[2];
 			int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
 			pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 			return depth == -1;
-		//}// else {
-		//	Complex c = distIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX);
-		//	pix[x+y*width] = Styler.sinHSV(c.x,c.y);
-		//	return false;
-		//}
+		} else {
+			Complex c = planeIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, iterations);
+			pix[x+y*width] = Styler.sinHSV(c.x,c.y);
+			return false;
+		}
 	}
 
 	//saves pix as an image
