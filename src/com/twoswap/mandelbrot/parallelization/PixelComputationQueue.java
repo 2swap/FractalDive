@@ -18,7 +18,7 @@ public class PixelComputationQueue {
 					while(true) {
 						try {
 							Computation c = PixelComputationQueue.queue.take();
-							Generator.doPixel(c.x, c.y, Generator.pix);
+							Generator.doPixel(c.x, c.y);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}

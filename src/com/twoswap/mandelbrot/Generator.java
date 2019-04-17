@@ -57,7 +57,7 @@ public class Generator {
 		//solve all remaining unknown points
 		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
 			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
-		queue.compute();
+		queue.compute();//doPixel(x,y);
 		
 		
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
@@ -72,6 +72,9 @@ public class Generator {
 //			if(renderCPoint && xvalhere > 0 && xvalhere < width && yvalhere > 0 && yvalhere < height) pix[xvalhere+(yvalhere)*width] = 0xffffff;//center pixel white
 //			pix[width/2+dx+(height/2+dy)*width] = 0xffffff;//center pixel white
 //		}
+		
+		for(int i = 0; i < pix.length; i++) if(pix[i] < 0) pix[i] = (int) Math.sqrt(Math.sqrt(-pix[i]/0x100))*0x100;
+		
 		Controller.zoom(pix, width, height, time);//tick controller
 		return pix;
 	}
@@ -129,6 +132,9 @@ public class Generator {
 		int divergeCount = 0; // iteration counter
 
 		while (!diverged) {
+			//int scrX = (int) ((editR-Controller.x)*Controller.zoom+width/2.);
+			//int scrY = (int) ((editI-Controller.y)*Controller.zoom+height/2.);
+			//if(scrX >=0 && scrX < width && scrY >=0 && scrY < height) pix[scrX+scrY*width]-=0x2000;
 			if (ei2+er2 > 4){diverged = true;break;} //out of circle
 			divergeCount++;
 			double newR, newI;
@@ -204,7 +210,8 @@ public class Generator {
 		return diverged?divergeCount:-1;
 	}
 
-	public static void doPixel(int x, int y, int[] pix) {
+	public static void doPixel(int x, int y) {
+		pix[x+y*width] = 0;
 		
 		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
 		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);

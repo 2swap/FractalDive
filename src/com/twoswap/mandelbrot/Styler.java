@@ -171,7 +171,7 @@ public class Styler {
 
 		double d = Math.sqrt((rZ*rZ+iZ*iZ)/16);
 		double scaler = Math.cos((d+.5)*Math.PI*2)/2+.5;
-		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
+		return (int) (Math.sqrt(Math.sqrt(ro*scaler))*64) * 0x10000 + (int) (Math.sqrt(Math.sqrt(go*scaler))*64) * 0x100 + (int) (Math.sqrt(Math.sqrt(bo*scaler))*64);
 	}
 
 	public static int angleHSV(double rZ, double iZ) {
@@ -181,7 +181,7 @@ public class Styler {
 		double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
 	
 		double scaler = Math.sqrt((rZ*rZ+iZ*iZ)/16);
-		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
+		return (int) (Math.sqrt(Math.sqrt(ro*scaler))*64) * 0x10000 + (int) (Math.sqrt(Math.sqrt(go*scaler))*64) * 0x100 + (int) (Math.sqrt(Math.sqrt(bo*scaler))*64);
 	}
 
 	public static int rawHSV(double rZ, double iZ) {

@@ -181,6 +181,6 @@ public class GUI{
 	}
 	
 	public static int itsBarToNumber(int x) {
-		return (int) (x + Math.exp(Math.sqrt(x)-3));
+		return (int) (x + Math.exp(Math.sqrt(1.5*x)-3));
 	}
 }
