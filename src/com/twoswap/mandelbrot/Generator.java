@@ -56,8 +56,8 @@ public class Generator {
 		
 		//solve all remaining unknown points
 		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
-			if(pix[x+y*width] == -1) doPixel(x, y, pix);
-		// queue.compute(); TODO: Figure out why I cannot run this in parrael
+			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
+		queue.compute();
 		
 		
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
@@ -199,12 +199,12 @@ public class Generator {
 		//if (diverged && divergeCount >= c.searchDepth*.999)c.searchDepth++;
 		if (diverged) minDepth = FastMath.min(minDepth, divergeCount);
 		if (diverged) maxDepth = FastMath.max(maxDepth, divergeCount);
-		outCoords[0] = editR-rC;
-		outCoords[1] = editI-iC;
+		outCoords[0] = editR;
+		outCoords[1] = editI;
 		return diverged?divergeCount:-1;
 	}
 
-	public static boolean doPixel(int x, int y, int[] pix) {
+	public static void doPixel(int x, int y, int[] pix) {
 		
 		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
 		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);
@@ -221,16 +221,15 @@ public class Generator {
 
 		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
 		
-		
+		int depthHere = 0;
 		if(Styler.iterationCount) {
 			double outCoords[] = new double[2];
-			int depth = computeDepth(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
-			pix[x + y * width] = Styler.getColor(depth, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
-			return depth == -1;
+			double cr0 = s1?rPart:Controller.rC, ci0 = s1?iPart:Controller.iC;
+			depthHere = computeDepth(cr0, ci0, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
+			pix[x + y * width] = depthHere == -1 ? Styler.inside(cr0,outCoords[0],ci0,outCoords[1]) : Styler.getColor(depthHere, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		} else {
 			Complex c = planeIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, iterations);
 			pix[x+y*width] = Styler.sinHSV(c.x,c.y);
-			return false;
 		}
 	}
 

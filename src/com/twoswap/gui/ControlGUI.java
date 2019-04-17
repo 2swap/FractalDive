@@ -15,8 +15,8 @@ import com.twoswap.mandelbrot.Controller;
 
 public class ControlGUI extends Panel{
 	private static final long serialVersionUID = 1L;
-	JSlider zoomSpeed, moveSpeed;
-	JCheckBox inv, burningShip;
+	public JSlider zoomSpeed, moveSpeed, va;
+	public JCheckBox inv, burningShip;
 	
 	public ControlGUI(int x, int y, int w, int h) {
 		setBackground(Color.lightGray);
@@ -40,14 +40,19 @@ public class ControlGUI extends Panel{
 		
 		moveSpeed = new JSlider(0,100,0);
 		moveSpeed.setBounds(GUI.margins,60,200-3*GUI.margins,32);
-		// Set the labels to be painted on the slider
 		moveSpeed.setPaintLabels(true);
-		// Add positions label in the slider
 		Hashtable<Integer, JLabel> moveSpeedPosition = new Hashtable<Integer, JLabel>();
 		for(int i = 0; i <= 100; i+=25) moveSpeedPosition.put(i, new JLabel(Math.round(Math.sqrt(i))+""));
-		// Set the label to be drawn
 		moveSpeed.setLabelTable(moveSpeedPosition); 
 		add(moveSpeed);
+		
+		va = new JSlider(0,100,50);
+		va.setBounds(GUI.margins+200,20,200-3*GUI.margins,32);
+		va.setPaintLabels(true);
+		Hashtable<Integer, JLabel> vaPosition = new Hashtable<Integer, JLabel>();
+		for(int i = 0; i <= 100; i+=25) vaPosition.put(i, new JLabel((i-50)/1000.+""));
+		va.setLabelTable(vaPosition); 
+		add(va);
 
 
 		inv = new JCheckBox("Inversion");
@@ -62,10 +67,10 @@ public class ControlGUI extends Panel{
 		
 		
 		Button b = new Button("Reset");
-		b.setBounds(GUI.margins,100,64,20); // setting button position
+		b.setBounds(GUI.margins,96,64,20); // setting button position
 		b.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				Controller.randomize();
+				Controller.reset();
 			}
 		});
 		add(b); // adding button into frame
@@ -75,5 +80,6 @@ public class ControlGUI extends Panel{
 		Controller.burningShip = burningShip.isSelected();
 		Controller.zoomSpeed = Math.pow(1.2,zoomSpeed.getValue()/50.-1);
 		Controller.speed = Math.sqrt(moveSpeed.getValue());
+		Controller.va = (va.getValue()-50)/1000.;
 	}
 }

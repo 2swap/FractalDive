@@ -13,7 +13,8 @@ import net.jafama.FastMath;
 public class Styler {
 
 	public static double inhale = 0;//how fast the colors should go in(-) or out(+)
-	public static String type = "rainbow";//the way it looks
+	public static String type;//the way it looks
+	public static String insideType;//the way it looks
 	public static boolean iterationCount = true;
 
 	//for image palettes
@@ -47,16 +48,10 @@ public class Styler {
 		if (depth >= 0) {// if it's not in the set
 			r = g = b = 255;
 			if (type.equals("rawhsv")) {
-				double theta = Math.atan2(iZ, rZ)*2;
-				double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
-				double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
-				double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
-
-				double d = Math.sqrt(rZ*rZ+iZ*iZ);
-				double scaler = d/4;
-				r = (int) (ro*scaler);
-				g = (int) (go*scaler);
-				b = (int) (bo*scaler);
+				return rawHSV(rZ,iZ);
+			}
+			if (type.equals("anglehsv")) {
+				return angleHSV(rZ,iZ);
 			}
 			if (type.equals("sinhsv")) {
 				return sinHSV(rZ,iZ);
@@ -91,7 +86,7 @@ public class Styler {
 				b*=shader;
 			}
 			if (type.equals("cycle")) {
-				double d = depth + inhale * time;
+				double d = depth + inhale;
 				while(d<0)d+=10;
 				int col1 = cycler[(int) ((d/5)%cycleWidth)][0];
 				int col2 = cycler[(int) ((d/5+1)%cycleWidth)][0];
@@ -108,24 +103,24 @@ public class Styler {
 				b = col&0xff;
 			}
 			if (type.equals("oldbow")) {
-				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 0. / 3)) / 3) + 128);
-				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 2. / 3)) / 3) + 128);
-				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale*time + Math.PI * 4. / 3)) / 3) + 128);
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale + Math.PI * 0. / 3)) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale + Math.PI * 2. / 3)) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale + Math.PI * 4. / 3)) / 3) + 128);
 			}
 			if (type.equals("popbow")) {
-				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
-				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale*time) / 3) + 128);
-				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale*time) / 3) + 128);
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale) / 3) + 128);
 			}
 			if (type.equals("deepbow")) {
-				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
-				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale*time) / 3) + 128);
-				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale*time) / 3) + 128);
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale) / 3) + 128);
 			}
 			if (type.equals("rainbow") || background) {
-				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale*time) / 3) + 128);
-				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale*time) / 3) + 128);
-				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale*time) / 3) + 128);
+				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale) / 3) + 128);
+				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale) / 3) + 128);
+				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale) / 3) + 128);
 			}
 		}
 		return r*0x10000+g*0x100+b;
@@ -174,8 +169,30 @@ public class Styler {
 		double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
 		double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
 
-		double d = Math.sqrt(rZ*rZ+iZ*iZ);
-		double scaler = Math.sin((d-.5)*Math.PI)/2+.5;
+		double d = Math.sqrt((rZ*rZ+iZ*iZ)/16);
+		double scaler = Math.cos((d+.5)*Math.PI*2)/2+.5;
 		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
+	}
+
+	public static int angleHSV(double rZ, double iZ) {
+		double theta = Math.atan2(iZ, rZ)*2;
+		double ro = 127 * FastMath.sin(theta + Math.PI * 2 / 3.) + 128;
+		double go = 127 * FastMath.sin(theta + Math.PI * 0 / 3.) + 128;
+		double bo = 127 * FastMath.sin(theta + Math.PI * 4 / 3.) + 128;
+	
+		double scaler = Math.sqrt((rZ*rZ+iZ*iZ)/16);
+		return (int) (ro*scaler) * 0x10000 + (int) (go*scaler) * 0x100 + (int) (bo*scaler);
+	}
+
+	public static int rawHSV(double rZ, double iZ) {
+		return (int) ((rZ+2)*256/4) * 0x10000 + (int) ((iZ+2)*256/4) * 0x100;
+	}
+
+	public static int inside(double r0, double fr, double i0, double fi) {
+		if (insideType.equals("rawhsv")) return rawHSV(fr-r0,fi-i0);
+		if (insideType.equals("anglehsv")) return angleHSV(fr-r0,fi-i0);
+		if (insideType.equals("sinhsv")) return sinHSV(fr-r0,fi-i0);
+		if (insideType.equals("dist")) return (int) (Math.sqrt(square(fr-r0)+square(fi-i0))*256/4)*0x10101;
+		return 0;
 	}
 }

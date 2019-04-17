@@ -6,11 +6,11 @@ import com.twoswap.mandelbrot.Generator;
 
 public class PixelComputationQueue {
 	public static LinkedBlockingDeque<Computation> queue;
-	private int threadcount;
+	//private int threadcount;
 	public static boolean run;
 	public PixelComputationQueue(int threadcount) {
-		this.threadcount = threadcount;
-		this.queue = new LinkedBlockingDeque<Computation>();
+		//this.threadcount = threadcount;
+		queue = new LinkedBlockingDeque<Computation>();
 		run = false;
 		for(int i = 0; i < threadcount; i++) {
 			Thread thread = new Thread(){

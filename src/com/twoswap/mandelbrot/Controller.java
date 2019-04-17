@@ -1,5 +1,7 @@
 package com.twoswap.mandelbrot;
 
+import com.twoswap.gui.GUI;
+
 //Controls where the generator looks for
 public class Controller {
 	
@@ -80,11 +82,18 @@ public class Controller {
 	}
 	
 	//move to a random point on the unit circle
-	public static void randomize() {
+	public static void reset() {
 		zoom = Generator.width/8.;
 		//va = Math.random()*.04-.02;
-		double theta = 2*Math.PI*Math.random();
-		x = Math.cos(theta)*1.2;
-		y = Math.sin(theta)*1.2;
+		zoomSpeed = 1;
+		GUI.controllerPanel.zoomSpeed.setValue(50);
+		speed = 0;
+		GUI.controllerPanel.moveSpeed.setValue(0);
+		iDrift = rDrift = 0;
+		inversion = burningShip = false;
+		GUI.controllerPanel.inv.setSelected(false);
+		GUI.controllerPanel.burningShip.setSelected(false);
+		angle = va = 0;
+		x = y = 0;
 	}
 }

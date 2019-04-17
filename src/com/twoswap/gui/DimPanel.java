@@ -10,13 +10,13 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 import com.twoswap.mandelbrot.Controller;
-import com.twoswap.mandelbrot.Generator;
 import com.twoswap.mandelbrot.extras.Calculator;
 
 class DimPanel extends Panel {
 	private static final long serialVersionUID = 1L;
 	public static char[] names = {'C','Z','X'};
 	public static String[] examples = {"<cos(x)/4-1,sin(x)/4>","<cos(x),sin(x)>","<2cos(x),0>"};
+	double paraTime = 0;
 	JCheckBox check;
 	boolean shouldRender;
 	DimCanvas c;
@@ -65,7 +65,7 @@ class DimPanel extends Panel {
 		
 		eqn = new TextField();
 		eqn.setBounds(20+GUI.dimCanvasWidth+GUI.margins*3,GUI.margins,w-4*GUI.margins-GUI.dimCanvasWidth-20,20);
-		eqn.setText("Example: '"+examples[p]+"'");
+		eqn.setText("#"+examples[p]);
 		add(eqn);
 		
 		
@@ -75,8 +75,8 @@ class DimPanel extends Panel {
 	public void render() {
 		
 		double s = pSpeed.getValue()/100.;
-		double q = Generator.time*(s*s*s);
-		String fn = eqn.getText().replaceAll("x", ""+q);
+		paraTime += s*s*s;
+		String fn = eqn.getText().replaceAll("x", ""+paraTime);
 		boolean b = fn.startsWith("<") && fn.endsWith(">") && fn.contains(",");
 		
 		double r=0,i=0;
