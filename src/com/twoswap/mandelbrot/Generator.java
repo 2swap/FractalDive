@@ -39,41 +39,40 @@ public class Generator {
 		//fill it with -1
 		Arrays.fill(pix, -1);
 		
-		
-		//brute force compute all points (x,y) for which x and y both even
-		for (int x = 0; x < width; x+=2) for (int y = 0; y < height; y+=2)
-			queue.addToQueue(x, y);
-		queue.compute();
-		//fill in points that can be determined by neighbors
-		optimizeFill(pix);
+		if(!Styler.inside) {
+			//brute force compute all points (x,y) for which x and y both even
+			for (int x = 0; x < width; x+=2) for (int y = 0; y < height; y+=2)
+				queue.addToQueue(x, y);
+			queue.compute();
+			//fill in points that can be determined by neighbors
+			optimizeFill(pix);
+				
+			//same as the last loop, but for x,y odd
+			for (int x = 1; x < width; x+=2) for (int y = 1; y < height; y+=2)
+				if(pix[x+y*width] == -1) queue.addToQueue(x, y);
+			queue.compute();
+			//repeat neighbor fill
+			optimizeFill(pix);
 			
-		//same as the last loop, but for x,y odd
-		for (int x = 1; x < width; x+=2) for (int y = 1; y < height; y+=2)
-			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
-		queue.compute();
-		//repeat neighbor fill
-		optimizeFill(pix);
-		
-		//solve all remaining unknown points
-		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
-			if(pix[x+y*width] == -1) queue.addToQueue(x, y);
-		queue.compute();//doPixel(x,y);
+			//solve all remaining unknown points
+			for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
+				if(pix[x+y*width] == -1) queue.addToQueue(x, y);
+			queue.compute();
+		} else {
+			for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) doPixel(x,y);
+		}
 		
 		
 		if(++time%10==0)System.out.println(time + " " + Controller.searchDepth);
 		lastMinDepth = minDepth;//update these for controller
 		lastMaxDepth = maxDepth;
+		
+		if(Styler.inside) for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) pix[x+y*width] = (int) (16*Math.log(pix[x+y*width]));
+		
 		if(FastMath.random() < imageRate) {
 			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			savePic(pix, "images/"+System.currentTimeMillis()+".png");//save pictures now and then
 		}
-//		for(int dx = 0; dx < 2; dx++)for(int dy = 0; dy < 2; dy++) {
-//			int xvalhere = width/2+dx+(int)(cpow.x*width/10.), yvalhere = height/2+dy-(int)(cpow.y*height/10.);
-//			if(renderCPoint && xvalhere > 0 && xvalhere < width && yvalhere > 0 && yvalhere < height) pix[xvalhere+(yvalhere)*width] = 0xffffff;//center pixel white
-//			pix[width/2+dx+(height/2+dy)*width] = 0xffffff;//center pixel white
-//		}
-		
-		for(int i = 0; i < pix.length; i++) if(pix[i] < 0) pix[i] = (int) Math.sqrt(Math.sqrt(-pix[i]/0x100))*0x100;
 		
 		Controller.zoom(pix, width, height, time);//tick controller
 		return pix;
@@ -118,9 +117,16 @@ public class Generator {
 		}
 	}
 
-	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX, int d) {
+	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX, int d, boolean draw) {
 		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
-		for(int i = 0; i < d; i++) c = c.multiply(c).add(new Complex(rC,iC));
+		for(int i = 0; i < d; i++) {
+			c = c.multiply(c).add(new Complex(rC,iC));
+			GUI.drawPoint(c.x,c.y,0xff0000,1);
+			if(Controller.burningShip) {
+				c.x = Math.abs(c.x);
+				c.y = Math.abs(c.y);
+			}
+		}
 		return c;
 	}
 	
@@ -132,9 +138,9 @@ public class Generator {
 		int divergeCount = 0; // iteration counter
 
 		while (!diverged) {
-			//int scrX = (int) ((editR-Controller.x)*Controller.zoom+width/2.);
-			//int scrY = (int) ((editI-Controller.y)*Controller.zoom+height/2.);
-			//if(scrX >=0 && scrX < width && scrY >=0 && scrY < height) pix[scrX+scrY*width]-=0x2000;
+			int scrX = (int) ((editR-Controller.x)*Controller.zoom+width/2.);
+			int scrY = (int) ((editI-Controller.y)*Controller.zoom+height/2.);
+			if(Styler.inside && scrX >=0 && scrX < width && scrY >=0 && scrY < height) pix[scrX+scrY*width]+=1;
 			if (ei2+er2 > 4){diverged = true;break;} //out of circle
 			divergeCount++;
 			double newR, newI;
@@ -215,8 +221,8 @@ public class Generator {
 		
 		double rotX = (x - width / 2) * FastMath.cos(Controller.angle) - (y - height / 2) * FastMath.sin(Controller.angle);
 		double rotY = (x - width / 2) * FastMath.sin(Controller.angle) + (y - height / 2) * FastMath.cos(Controller.angle);
-		double rPart = rotX / (Controller.zoom) + Controller.x;
-		double iPart = rotY / (Controller.zoom) + Controller.y;// width, zoom is in terms of width. Stretched otherwise.
+		double rPart = rotX / Controller.zoom + Controller.x;
+		double iPart = rotY / Controller.zoom + Controller.y;// width, zoom is in terms of width. Stretched otherwise.
 		
 		//this is for last minute changes to pixel coords.
 		if(Controller.inversion) {
@@ -229,13 +235,13 @@ public class Generator {
 		boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
 		
 		int depthHere = 0;
-		if(Styler.iterationCount) {
+		if(Styler.iterationCount || Styler.inside) {
 			double outCoords[] = new double[2];
 			double cr0 = s1?rPart:Controller.rC, ci0 = s1?iPart:Controller.iC;
 			depthHere = computeDepth(cr0, ci0, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, outCoords);
-			pix[x + y * width] = depthHere == -1 ? Styler.inside(cr0,outCoords[0],ci0,outCoords[1]) : Styler.getColor(depthHere, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
+			if(!Styler.inside) pix[x + y * width] = depthHere == -1 ? Styler.inside(cr0,outCoords[0],ci0,outCoords[1]) : Styler.getColor(depthHere, time, lastMinDepth, lastMaxDepth, outCoords[0], outCoords[1]);
 		} else {
-			Complex c = planeIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, iterations);
+			Complex c = planeIteration(s1?rPart:Controller.rC, s1?iPart:Controller.iC, s2?rPart:Controller.rZ, s2?iPart:Controller.iZ, s3?rPart:Controller.rX, s3?iPart:Controller.iX, iterations, false);
 			pix[x+y*width] = Styler.sinHSV(c.x,c.y);
 		}
 	}

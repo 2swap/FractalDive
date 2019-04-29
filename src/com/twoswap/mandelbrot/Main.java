@@ -1,11 +1,8 @@
 package com.twoswap.mandelbrot;
 
-import java.awt.Canvas;
-
 import com.twoswap.gui.GUI;
 
-public class Main extends Canvas implements Runnable {
-	private static final long serialVersionUID = 1L;
+public class Main implements Runnable {
 	public static final String TITLE = "Fractal Dive";
 
 	private static  boolean running = false;
@@ -37,7 +34,6 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	public void run() {
-		requestFocus();
 		while (running) tick();
 	}
 

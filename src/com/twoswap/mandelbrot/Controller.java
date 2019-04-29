@@ -34,8 +34,6 @@ public class Controller {
 		//i0 = Math.sin(q);//circle
 		//r0 = q;
 		//i0 = 0;
-		angle += va;//rotate appropriately
-		zoom *= zoomSpeed;//zoom in
 		
 		if(speed!=0) {
 			//change coords towards a more interesting spot
@@ -83,10 +81,9 @@ public class Controller {
 	
 	//move to a random point on the unit circle
 	public static void reset() {
-		zoom = Generator.width/8.;
-		//va = Math.random()*.04-.02;
 		zoomSpeed = 1;
 		GUI.controllerPanel.zoomSpeed.setValue(50);
+		GUI.controllerPanel.zoomBar.setValue(400);
 		speed = 0;
 		GUI.controllerPanel.moveSpeed.setValue(0);
 		iDrift = rDrift = 0;
@@ -94,6 +91,8 @@ public class Controller {
 		GUI.controllerPanel.inv.setSelected(false);
 		GUI.controllerPanel.burningShip.setSelected(false);
 		angle = va = 0;
+		GUI.controllerPanel.va.setValue(50);
+		GUI.controllerPanel.angleBar.setValue(0);
 		x = y = 0;
 	}
 }

@@ -16,7 +16,7 @@ public class StyleGUI extends Panel{
 	private static final long serialVersionUID = 1L;
 	TextField tf,tfi;
 	JSlider inhale;
-	JRadioButton r1,r2;
+	JRadioButton r1,r2, r3;
 	
 	public StyleGUI(int x, int y, int w, int h) {
 		setBackground(Color.lightGray);
@@ -43,20 +43,23 @@ public class StyleGUI extends Panel{
 		add(tf);
 		
 		tfi= new TextField("none");
-		tfi.setBounds(GUI.margins*2+196,16+32+2*GUI.margins,188,16);
+		tfi.setBounds(GUI.margins*2+196,64+2*GUI.margins,188,16);
 		add(tfi);
 		
-		r1 = new JRadioButton("Iteration Count");
-		r2 = new JRadioButton("Result of iterations");
+		r1 = new JRadioButton("Corona");
+		r2 = new JRadioButton("Result");
+		r3 = new JRadioButton("Popularity");
 		r1.setBounds(196+2*GUI.margins,GUI.margins+16,188,16);
 		r2.setBounds(196+2*GUI.margins,GUI.margins+32,188,16);
+		r3.setBounds(196+2*GUI.margins,GUI.margins+48,188,16);
 		r1.setSelected(true);
 		ButtonGroup bg = new ButtonGroup();
-		bg.add(r1);bg.add(r2);
-		add(r1);add(r2);
+		bg.add(r1);bg.add(r2);bg.add(r3);
+		add(r1);add(r2);add(r3);
 	}
 	public void tick() {
 		Styler.iterationCount = r1.isSelected();
+		Styler.inside = r3.isSelected();
 		Styler.type = tf.getText();
 		Styler.insideType = tfi.getText();
 		Styler.inhale += inhale.getValue()/50.-1;

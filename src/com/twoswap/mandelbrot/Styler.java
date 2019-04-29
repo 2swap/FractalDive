@@ -15,7 +15,7 @@ public class Styler {
 	public static double inhale = 0;//how fast the colors should go in(-) or out(+)
 	public static String type;//the way it looks
 	public static String insideType;//the way it looks
-	public static boolean iterationCount = true;
+	public static boolean iterationCount = true, inside = false;
 
 	//for image palettes
 	public static int cycleWidth = 1, cycleHeight = 1;
