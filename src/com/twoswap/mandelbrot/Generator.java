@@ -19,7 +19,7 @@ public class Generator {
 	public static int minDepth, maxDepth, lastMinDepth = 500000, lastMaxDepth = 0, time = 0, iterations = 0;//some stuff the program keeps track of
 	
 	//Settings for zooms- change away!
-	public static int width = 512, height = 512; //screen size
+	public static int width = 1280, height = 720; //screen size
 	public static boolean record = false; //Whether or not to save it as gif
 	public static double imageRate = .0001;
 	
@@ -118,10 +118,14 @@ public class Generator {
 	}
 
 	public static Complex planeIteration(double rC, double iC, double rZ, double iZ, double rX, double iX, int d, boolean draw) {
-		Complex c = new Complex(rZ, iZ); //TODO use pow(iX and rX), but there's a bug i think
+		Complex c = new Complex(rZ, iZ), lc = c; //TODO use pow(iX and rX), but there's a bug i think
 		for(int i = 0; i < d; i++) {
 			c = c.multiply(c).add(new Complex(rC,iC));
-			GUI.drawPoint(c.x,c.y,0xff0000,1);
+			if(draw) {
+				if(GUI.stylerPanel.point.isSelected())GUI.drawPoint(c.x,c.y,0xff0000,1);
+				if(lc.x != 0 && GUI.stylerPanel.line.isSelected()) GUI.drawLine(lc,c,0xffff00);
+				lc = c;
+			}
 			if(Controller.burningShip) {
 				c.x = Math.abs(c.x);
 				c.y = Math.abs(c.y);

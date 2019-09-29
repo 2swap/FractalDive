@@ -23,7 +23,6 @@ public class Input implements KeyListener, FocusListener, MouseListener, MouseMo
 
 	public static void update() {
 		if(mouseInFrame) {
-			System.out.println(mouseX);
 			boolean s1 = Controller.s1, s2 = Controller.s2, s3 = Controller.s3;
 			Complex c = GUI.screenToMand(mouseX,mouseY);
 			Generator.planeIteration(s1?c.x:Controller.rC, s1?c.y:Controller.iC, s2?c.x:Controller.rZ, s2?c.y:Controller.iZ, s3?c.x:Controller.rX, s3?c.y:Controller.iX, 100, true);

@@ -6,6 +6,7 @@ import java.awt.TextField;
 import java.util.Hashtable;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
@@ -17,6 +18,7 @@ public class StyleGUI extends Panel{
 	TextField tf,tfi;
 	JSlider inhale;
 	JRadioButton r1,r2, r3;
+	public JCheckBox line,point;
 	
 	public StyleGUI(int x, int y, int w, int h) {
 		setBackground(Color.lightGray);
@@ -56,6 +58,14 @@ public class StyleGUI extends Panel{
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(r1);bg.add(r2);bg.add(r3);
 		add(r1);add(r2);add(r3);
+
+		line = new JCheckBox("Line");
+		line.setBounds(0,100,64,16);
+		add(line);
+		
+		point = new JCheckBox("Point");
+		point.setBounds(0,116,64,16);
+		add(point);
 	}
 	public void tick() {
 		Styler.iterationCount = r1.isSelected();

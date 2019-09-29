@@ -15,6 +15,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
+import com.twoswap.gui.GUI;
 import com.twoswap.mandelbrot.Generator;
 
 public abstract class Gif {
@@ -40,7 +41,7 @@ public abstract class Gif {
 		gifWriter.prepareWriteSequence(null);
 		for (int i = 0; i < images.length; i++) {
 			BufferedImage img = images[i];
-			if(i%10==0)System.out.println("Saving gif: " + i / (double) Generator.time * 100 + "%");
+			if(i%10==0) GUI.clog("Saving gif: " + i / (double) Generator.time * 100 + "%");
 			IIOImage temp = new IIOImage(img, null, metadata);
 			gifWriter.writeToSequence(temp, null);
 		}
@@ -113,10 +114,10 @@ public abstract class Gif {
 			imgs[i] = "giffer/img" + i + ".png";
 		try {
 			//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			Gif.generateFromFiles(imgs, "outputGifs/"+System.currentTimeMillis()+".gif", 3, true);
+			generateFromFiles(imgs, "outputGifs/"+System.currentTimeMillis()+".gif", 3, true);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		System.out.println("Saved!");
+		GUI.clog("Saved!");
 	}
 }

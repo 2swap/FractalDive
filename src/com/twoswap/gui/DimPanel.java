@@ -15,7 +15,7 @@ import com.twoswap.mandelbrot.extras.Calculator;
 class DimPanel extends Panel {
 	private static final long serialVersionUID = 1L;
 	public static char[] names = {'C','Z','X'};
-	public static String[] examples = {"<cos(x)/4-1,sin(x)/4>","<cos(x),sin(x)>","<2cos(x),0>"};
+	public static String[] examples = {"<cos(x)/4-1,sin(x)/4>","<cos(x),sin(x)>","<2cos(x),0>"};//<.5*(1-cos(x))*cos(x),.5*(1-cos(x))*sin(x)> main cardioid
 	double paraTime = 0;
 	JCheckBox check;
 	boolean shouldRender;
@@ -54,10 +54,10 @@ class DimPanel extends Panel {
 		
 		
 		
-		rPart = new JSlider(-80,80,0);
+		rPart = new JSlider(-400,400,0);
 		rPart.setBounds(GUI.margins,GUI.margins*2+GUI.dimCanvasWidth,GUI.dimCanvasWidth,20);
 		add(rPart);
-		iPart = new JSlider(JSlider.VERTICAL,-80,80,0);
+		iPart = new JSlider(JSlider.VERTICAL,-400,400,0);
 		iPart.setBounds(GUI.margins*2+GUI.dimCanvasWidth,GUI.margins,20,GUI.dimCanvasWidth);
 		add(iPart);
 		
@@ -70,7 +70,7 @@ class DimPanel extends Panel {
 		
 		
 		
-		if(p == 2) rPart.setValue(-40);//exponent 2 by default
+		if(p == 2) rPart.setValue(-200);//exponent 2 by default
 	}
 	public void render() {
 		
@@ -84,11 +84,11 @@ class DimPanel extends Panel {
 		if(b) {
 			r = Double.parseDouble(Calculator.calc(fn.substring(1).split(",")[0]));
 			i = Double.parseDouble(Calculator.calc(fn.split(",")[1].split(">")[0]));
-			rPart.setValue((int) (-20*r));
-			iPart.setValue((int) (-20*i));
+			rPart.setValue((int) (-100*r));
+			iPart.setValue((int) (-100*i));
 		} else {
-			r = -rPart.getValue()/20.;
-			i = -iPart.getValue()/20.;
+			r = -rPart.getValue()/100.;
+			i = -iPart.getValue()/100.;
 		}
 		
 		DecimalFormat df = new DecimalFormat("#.00");
@@ -106,7 +106,7 @@ class DimPanel extends Panel {
 		}
 		
 		
-		if(check.isSelected()) c.render(-rPart.getValue()/20., -iPart.getValue()/20.);
+		if(check.isSelected()) c.render(-rPart.getValue()/100., -iPart.getValue()/100.);
 		else c.renderX();
 	}
 }

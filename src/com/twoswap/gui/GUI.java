@@ -41,70 +41,37 @@ public class GUI{
 	static Canvas mainCanvas = new Canvas();
 	private static BufferedImage img;
 	public static int[] pixels;
+	public static Frame f;
 	public static Input in = new Input();
-	public static Panel leftPanel = new Panel();
+	public static Panel extraPanel = new Panel();
 	
 	public GUI(){
+		
+		//frame
+		f = new Frame("Fractal Dive");
+		f.setLayout(null);
+		f.setSize(50,50);//to set insets
+		f.setVisible(true);
+		f.setSize(f.getInsets().left+f.getInsets().right+Generator.width+400, f.getInsets().top+f.getInsets().bottom+Generator.height+200);
+		//f.setResizable(false);
 		
 		mainCanvas.addMouseListener(in);
 		mainCanvas.addMouseMotionListener(in);
 		mainCanvas.addMouseWheelListener(in);
 		mainCanvas.addKeyListener(in);
+		mainCanvas.setBounds(f.getInsets().left + margins,f.getInsets().top + margins,Generator.width,Generator.height);
+		f.add(mainCanvas);
 		
 		img = new BufferedImage(Generator.width, Generator.height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 		
-		//frame
-		Frame f= new Frame("Fractal Dive");
-		f.setLayout(null);
-		f.setSize(50,50);//to set insets
-		f.setVisible(true);
-		f.setSize(f.getInsets().left+f.getInsets().right+1200, f.getInsets().top+f.getInsets().bottom+800);
-		//f.setResizable(false);
-		
-		
 		//right panel
 		for(int i = 0; i < 3; i++) {
-			dimensions[i] = new DimPanel(800+f.getInsets().left, f.getInsets().top+margins+200*i, 400-margins, 200-margins, i);
+			dimensions[i] = new DimPanel(Generator.width+f.getInsets().left+2*margins, f.getInsets().top+margins+200*i, 400-margins, 200-margins, i);
 			f.add(dimensions[i]);
 		}
-
-
-		//left panel
-		leftPanel.setBackground(Color.lightGray);
-		leftPanel.setLayout(null);
-		leftPanel.setBounds(f.getInsets().left+margins, f.getInsets().top+margins, 800-2*margins, 600-margins);
-		addCZXButtons();
 		
-		
-		addConsole();
-
-
-		addIterationsSlider();
-		
-
-		
-		
-		mainCanvas.setBounds(margins,margins,Generator.width,Generator.height);
-		leftPanel.add(mainCanvas);
-		
-		f.add(leftPanel);
-		
-		
-		//styler panel
-		stylerPanel = new StyleGUI(800+f.getInsets().left, f.getInsets().top+margins+600, 400-margins, 200-2*margins);
-		f.add(stylerPanel);
-		
-		//controller panel
-		controllerPanel = new ControlGUI(400+f.getInsets().left, f.getInsets().top+margins+600, 400-margins, 200-2*margins);
-		f.add(controllerPanel);
-		
-		//controller panel
-		gifPanel = new GifGUI(f.getInsets().left + margins, f.getInsets().top+margins+600, 400-2*margins, 200-2*margins);
-		f.add(gifPanel);
-		
-		
-		
+		makeBottomRow();
 		
 		f.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent we){
@@ -113,13 +80,38 @@ public class GUI{
 		});
 	}
 
+	private void makeBottomRow() {
+		
+		//extra panel
+		extraPanel.setBackground(Color.lightGray);
+		extraPanel.setLayout(null);
+		extraPanel.setBounds(f.getInsets().left+1200, Generator.height+f.getInsets().top+margins*2, 400-margins, 200-3*margins);
+		addCZXButtons();
+		addConsole();
+		addIterationsSlider();
+		f.add(extraPanel);
+		
+		//styler panel
+		stylerPanel = new StyleGUI(800+f.getInsets().left, f.getInsets().top+margins*2+Generator.height, 400-margins, 200-3*margins);
+		f.add(stylerPanel);
+		
+		//controller panel
+		controllerPanel = new ControlGUI(400+f.getInsets().left, f.getInsets().top+margins*2+Generator.height, 400-margins, 200-3*margins);
+		f.add(controllerPanel);
+		
+		//controller panel
+		gifPanel = new GifGUI(f.getInsets().left+margins, f.getInsets().top+margins*2+Generator.height, 400-2*margins, 200-3*margins);
+		f.add(gifPanel);
+		
+	}
+
 	private void addCZXButtons() {
 		JCheckBox radioC = new JCheckBox("C");
 		JCheckBox radioZ = new JCheckBox("Z");
 		JCheckBox radioX = new JCheckBox("X");
-		radioC.setBounds(Generator.width+margins*2+0*(margins+64), margins, 64, 16);
-		radioZ.setBounds(Generator.width+margins*2+1*(margins+64), margins, 64, 16);
-		radioX.setBounds(Generator.width+margins*2+2*(margins+64), margins, 64, 16);
+		radioC.setBounds(margins*2+0*(margins+64), margins, 64, 16);
+		radioZ.setBounds(margins*2+1*(margins+64), margins, 64, 16);
+		radioX.setBounds(margins*2+2*(margins+64), margins, 64, 16);
 		radioC.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				Controller.s1 = radioC.isSelected();
@@ -137,22 +129,22 @@ public class GUI{
 		});
 		radioC.setSelected(true);
 		radioZ.setSelected(false);
-		leftPanel.add(radioC);
-		leftPanel.add(radioZ);
-		leftPanel.add(radioX);
+		extraPanel.add(radioC);
+		extraPanel.add(radioZ);
+		extraPanel.add(radioX);
 	}
 
 	public static void addConsole() {
 		consoleArea = new JTextArea();
-		consoleArea.setBounds(margins,margins*2+Generator.height, Generator.width, 600-Generator.height-4*margins);
+		consoleArea.setBounds(margins,64+margins, 400-3*margins, 100);
 		consoleArea.setEditable(false);
 		clog("Console Loaded");
-		leftPanel.add(consoleArea);
+		extraPanel.add(consoleArea);
 	}
 	
 	private void addIterationsSlider() {
 		its = new JSlider(0,100,20);
-		its.setBounds(2*margins+Generator.height,margins*2+16,256,32);
+		its.setBounds(2*margins,margins*2+16,256,32);
 		// Set the labels to be painted on the slider
 		its.setPaintLabels(true);
 		// Add positions label in the slider
@@ -160,10 +152,10 @@ public class GUI{
 		for(int i = 0; i <= 100; i+=20) itsPosition.put(i, new JLabel(itsBarToNumber(i)+""));
 		// Set the label to be drawn
 		its.setLabelTable(itsPosition); 
-		leftPanel.add(its);
+		extraPanel.add(its);
 		itsLabel = new JLabel();
-		itsLabel.setBounds(2*margins+Generator.height,margins*2+64,256,32);
-		leftPanel.add(itsLabel);
+		itsLabel.setBounds(2*margins+275,margins*2+16,256,32);
+		extraPanel.add(itsLabel);
 	}
 
 	public static void clog(String str) {
@@ -241,8 +233,10 @@ public class GUI{
 		
 		double dist = Math.sqrt((sx1-sx2)*(sx1-sx2)+(sy1-sy2)*(sy1-sy2));
 		
-		for(int d = 0; d < dist; d++)
-			drawPoint(intlerp(sx1,sx2, dist/d), intlerp(sy1,sy2, dist/d), col, 1);
+		for(int d = 0; d < dist; d++) {
+			int sxh = intlerp(sx1,sx2, d/dist), syh = intlerp(sy1,sy2, d/dist);
+			if(sxh>=0 && sxh < Generator.width && syh>=0 && syh < Generator.height) pixels[sxh+syh*Generator.width] = col;
+		}
 	}
 	
 	public static Complex screenToMand(int x, int y) { // Takes point in mandelbrot-space and draws on screen

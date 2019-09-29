@@ -93,6 +93,7 @@ public class Controller {
 		angle = va = 0;
 		GUI.controllerPanel.va.setValue(50);
 		GUI.controllerPanel.angleBar.setValue(0);
-		x = y = 0;
+		x = -0.109058399078985;
+		y = 0.9001524425476675;
 	}
 }

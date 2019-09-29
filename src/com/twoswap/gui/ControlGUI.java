@@ -83,7 +83,7 @@ public class ControlGUI extends Panel{
 		moveSpeed.setBounds(0,128+2*GUI.margins,leftPanel.getWidth(),32);
 		moveSpeed.setPaintLabels(true);
 		Hashtable<Integer, JLabel> moveSpeedPosition = new Hashtable<Integer, JLabel>();
-		for(int i = 0; i <= 100; i+=25) moveSpeedPosition.put(i, new JLabel(Math.round(Math.sqrt(i))+""));
+		for(int i = 0; i <= 100; i+=25) moveSpeedPosition.put(i, new JLabel(Math.round(Math.sqrt(i)/2)+""));
 		moveSpeed.setLabelTable(moveSpeedPosition); 
 		leftPanel.add(moveSpeed);
 		
@@ -139,7 +139,7 @@ public class ControlGUI extends Panel{
 		Controller.zoom = Math.exp(zoomBar.getValue()/2000.) * Controller.zoomSpeed;
 		zoomBar.setValue((int) (2000*Math.log(Controller.zoom)));
 		
-		Controller.speed = Math.sqrt(moveSpeed.getValue());
+		Controller.speed = Math.sqrt(moveSpeed.getValue())/2;
 		
 		Controller.va = (va.getValue()-50)/500.;
 		Controller.angle = (angleBar.getValue()*6.28/3600 + Controller.va+6.28)%6.28;
