@@ -59,13 +59,13 @@ public class Input implements KeyListener, FocusListener, MouseListener, MouseMo
 
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (keyCode > 0 && keyCode < key.length) {
+		if (keyCode > 0 && keyCode < key.length)
 			key[keyCode] = true;
-		}
-		if (keyCode == 37) Controller.x -= .01 * Generator.width / Controller.zoom;
-		if (keyCode == 38) Controller.y -= .01 * Generator.height / Controller.zoom;
-		if (keyCode == 39) Controller.x += .01 * Generator.width / Controller.zoom;
-		if (keyCode == 40) Controller.y += .01 * Generator.height / Controller.zoom;
+		System.out.println(keyCode);
+		if (keyCode == 37 || keyCode == 65) Controller.x -= .01 * Generator.width / Controller.zoom;
+		if (keyCode == 38 || keyCode == 87) Controller.y -= .01 * Generator.height / Controller.zoom;
+		if (keyCode == 39 || keyCode == 68) Controller.x += .01 * Generator.width / Controller.zoom;
+		if (keyCode == 40 || keyCode == 83) Controller.y += .01 * Generator.height / Controller.zoom;
 	}
 
 	public void keyReleased(KeyEvent e) {

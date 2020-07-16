@@ -71,13 +71,7 @@ public class Styler {
 			}
 			if (type.equals("light")) {
 				double num = ((double)depth - lastMinDepth)/(lastMaxDepth - lastMinDepth);
-				r = g = b = (int) (Math.sqrt(num)*256);
-			}
-			if(type.equals("undark")) {
-				double shader = Math.exp(-5*(depth-lastMinDepth)/(.01+lastMaxDepth-lastMinDepth));
-				r=(int) (255-r*shader);
-				g=(int) (255-g*shader);
-				b=(int) (255-b*shader);
+				r = g = b = (int) (num*256);
 			}
 			if(type.equals("dark")) {
 				double shader = Math.exp(-5*(depth-lastMinDepth)/(.01+lastMaxDepth-lastMinDepth));
@@ -102,6 +96,12 @@ public class Styler {
 				g = (col&0xff00)>>8;
 				b = col&0xff;
 			}
+			if (type.equals("lightbow")) {
+				double num = Math.log(depth - lastMinDepth+1)/Math.log(lastMaxDepth - lastMinDepth+1);
+				r = (int) (num*(127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale) / 3) + 128));
+				g = (int) (num*(127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (1 + inhale) / 3) + 128));
+				b = (int) (num*(127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale) / 3) + 128));
+			}
 			if (type.equals("oldbow")) {
 				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale + Math.PI * 0. / 3)) / 3) + 128);
 				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (3 + 1.5 * FastMath.sin(inhale + Math.PI * 2. / 3)) / 3) + 128);
@@ -121,6 +121,10 @@ public class Styler {
 				r = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (2 + inhale) / 3) + 128);
 				g = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (0 + inhale) / 3) + 128);
 				b = (int) (127 * FastMath.sin(depth / 10. * Math.PI + Math.PI * (4 + inhale) / 3) + 128);
+			}
+			if (type.equals("smoothcontrast")) {
+				double num = Math.sin(Math.sqrt(Math.sqrt(rZ*rZ+iZ*iZ))/90*Math.PI);
+				r = g = b = (int) (num*256);
 			}
 		}
 		return r*0x10000+g*0x100+b;

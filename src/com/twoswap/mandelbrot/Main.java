@@ -46,6 +46,7 @@ public class Main implements Runnable {
 	public static void main(String[] args) {
 		Main main = new Main();
 		main.start();
+		Styler.inventCycle();
 		//Generator.setupMagicPalette();
 	}
 }

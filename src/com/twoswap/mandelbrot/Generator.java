@@ -145,7 +145,7 @@ public class Generator {
 			int scrX = (int) ((editR-Controller.x)*Controller.zoom+width/2.);
 			int scrY = (int) ((editI-Controller.y)*Controller.zoom+height/2.);
 			if(Styler.inside && scrX >=0 && scrX < width && scrY >=0 && scrY < height) pix[scrX+scrY*width]+=1;
-			if (ei2+er2 > 4){diverged = true;break;} //out of circle
+			if (ei2+er2 > 10000){diverged = true;break;} //out of arbitrarily large circle
 			divergeCount++;
 			double newR, newI;
 			
